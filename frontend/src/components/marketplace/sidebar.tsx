@@ -1,3 +1,5 @@
+"use client";
+
 import { Search, Grid2x2, UserRound, CirclePlus, type LucideIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -6,28 +8,49 @@ import { cn } from "@/lib/utils";
 import { categories } from "@/lib/categories";
 
 function SidebarLink({
-  href,
   icon: Icon,
   label,
   iconClassName,
+  active,
+  href,
+  onClick,
 }: {
-  href: string;
   icon: LucideIcon;
   label: string;
   iconClassName?: string;
+  active?: boolean;
+  href?: string;
+  onClick?: () => void;
 }) {
+  const className = cn(
+    "flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium hover:bg-accent",
+    active && "bg-accent"
+  );
+
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} className={className}>
+        <Icon className={cn("h-5 w-5", iconClassName)} />
+        {label}
+      </button>
+    );
+  }
+
   return (
-    <a
-      href={href}
-      className="flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium hover:bg-accent"
-    >
+    <a href={href ?? "#"} className={className}>
       <Icon className={cn("h-5 w-5", iconClassName)} />
       {label}
     </a>
   );
 }
 
-export function Sidebar() {
+export function Sidebar({
+  selectedCategory,
+  onSelectCategory,
+}: {
+  selectedCategory: string | null;
+  onSelectCategory: (slug: string | null) => void;
+}) {
   return (
     <div className="flex h-full flex-col gap-4">
       <div className="relative">
@@ -39,7 +62,13 @@ export function Sidebar() {
       </div>
 
       <nav className="flex flex-col gap-1">
-        <SidebarLink href="#" icon={Grid2x2} label="Browse all" iconClassName="text-brand-maroon" />
+        <SidebarLink
+          icon={Grid2x2}
+          label="Browse all"
+          iconClassName="text-brand-maroon"
+          active={selectedCategory === null}
+          onClick={() => onSelectCategory(null)}
+        />
         <SidebarLink href="#" icon={UserRound} label="VT account" iconClassName="text-brand-maroon" />
       </nav>
 
@@ -61,10 +90,11 @@ export function Sidebar() {
           {categories.map((category) => (
             <SidebarLink
               key={category.slug}
-              href={`#${category.slug}`}
               icon={category.icon}
               label={category.label}
               iconClassName="text-brand-orange"
+              active={selectedCategory === category.slug}
+              onClick={() => onSelectCategory(category.slug)}
             />
           ))}
         </div>
