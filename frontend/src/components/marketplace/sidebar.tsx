@@ -1,12 +1,12 @@
 "use client";
 
-import { Search, Grid2x2, UserRound, CirclePlus, type LucideIcon } from "lucide-react";
+import { Search, Grid2x2, UserRound, type LucideIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { CreateListingDialog } from "@/components/marketplace/create-listing-dialog";
 import { cn } from "@/lib/utils";
 import { categories } from "@/lib/categories";
-import { locations } from "@/lib/services";
+import { locations, type Service } from "@/lib/services";
 
 function SidebarLink({
   icon: Icon,
@@ -50,11 +50,13 @@ export function Sidebar({
   onSelectCategory,
   selectedLocation,
   onSelectLocation,
+  onCreateListing,
 }: {
   selectedCategory: string | null;
   onSelectCategory: (slug: string | null) => void;
   selectedLocation: string | null;
   onSelectLocation: (location: string | null) => void;
+  onCreateListing: (service: Service) => void;
 }) {
   return (
     <div className="flex h-full flex-col gap-4">
@@ -80,13 +82,7 @@ export function Sidebar({
         <SidebarLink href="#" icon={UserRound} label="VT account" iconClassName="text-brand-maroon" />
       </nav>
 
-      <Button
-        variant="outline"
-        className="font-heading justify-start gap-2 border-brand-maroon text-brand-maroon hover:bg-brand-maroon hover:text-white"
-      >
-        <CirclePlus className="h-4 w-4" />
-        Create new listing
-      </Button>
+      <CreateListingDialog onCreate={onCreateListing} />
 
       <Separator />
 

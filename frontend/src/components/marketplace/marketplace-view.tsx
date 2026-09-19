@@ -5,9 +5,10 @@ import { Sidebar } from "@/components/marketplace/sidebar";
 import { LocationBadge } from "@/components/marketplace/location-badge";
 import { ServiceCard } from "@/components/marketplace/service-card";
 import { categories } from "@/lib/categories";
-import { services } from "@/lib/services";
+import { services as initialServices, type Service } from "@/lib/services";
 
 export function MarketplaceView() {
+  const [services, setServices] = useState<Service[]>(initialServices);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
 
@@ -28,6 +29,9 @@ export function MarketplaceView() {
             onSelectCategory={setSelectedCategory}
             selectedLocation={selectedLocation}
             onSelectLocation={setSelectedLocation}
+            onCreateListing={(service) =>
+              setServices((prev) => [service, ...prev])
+            }
           />
         </div>
       </aside>
