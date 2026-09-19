@@ -57,15 +57,19 @@ export function AccountView() {
         </div>
 
         <div className="flex flex-col items-end gap-2">
-          <div className="inline-flex rounded-full border border-brand-maroon p-1.5">
+          <div className="relative inline-flex rounded-full border border-brand-maroon p-1.5">
+            <div
+              className={cn(
+                "absolute inset-y-1.5 left-1.5 w-24 rounded-full bg-brand-orange transition-transform duration-300 ease-in-out",
+                view === "buyer" && "translate-x-24"
+              )}
+            />
             <button
               type="button"
               onClick={() => setView("vendor")}
               className={cn(
-                "rounded-full px-6 py-2 text-base font-semibold",
-                view === "vendor"
-                  ? "bg-brand-orange text-white"
-                  : "text-brand-maroon"
+                "relative z-10 w-24 rounded-full py-2 text-base font-semibold transition-colors duration-300",
+                view === "vendor" ? "text-white" : "text-brand-maroon"
               )}
             >
               Vendor
@@ -74,10 +78,8 @@ export function AccountView() {
               type="button"
               onClick={() => setView("buyer")}
               className={cn(
-                "rounded-full px-6 py-2 text-base font-semibold",
-                view === "buyer"
-                  ? "bg-brand-orange text-white"
-                  : "text-brand-maroon"
+                "relative z-10 w-24 rounded-full py-2 text-base font-semibold transition-colors duration-300",
+                view === "buyer" ? "text-white" : "text-brand-maroon"
               )}
             >
               Buyer
