@@ -15,6 +15,7 @@ function SidebarLink({
   active,
   href,
   onClick,
+  bubble,
 }: {
   icon: LucideIcon;
   label: string;
@@ -22,16 +23,26 @@ function SidebarLink({
   active?: boolean;
   href?: string;
   onClick?: () => void;
+  bubble?: boolean;
 }) {
   const className = cn(
-    "flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium hover:bg-accent",
+    "flex items-center gap-3 rounded-md px-2 hover:bg-accent",
+    bubble ? "py-2 text-base font-medium" : "py-2 text-sm font-medium",
     active && "bg-accent"
+  );
+
+  const iconEl = bubble ? (
+    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary">
+      <Icon className={cn("h-5 w-5", iconClassName)} />
+    </span>
+  ) : (
+    <Icon className={cn("h-5 w-5 shrink-0", iconClassName)} />
   );
 
   if (onClick) {
     return (
       <button type="button" onClick={onClick} className={className}>
-        <Icon className={cn("h-5 w-5", iconClassName)} />
+        {iconEl}
         {label}
       </button>
     );
@@ -39,7 +50,7 @@ function SidebarLink({
 
   return (
     <a href={href ?? "#"} className={className}>
-      <Icon className={cn("h-5 w-5", iconClassName)} />
+      {iconEl}
       {label}
     </a>
   );
@@ -118,7 +129,7 @@ export function Sidebar({
         <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground">
           Categories
         </h3>
-        <div className="flex flex-col gap-0.5">
+        <div className="flex flex-col gap-1">
           {categories.map((category) => (
             <SidebarLink
               key={category.slug}
@@ -127,6 +138,7 @@ export function Sidebar({
               iconClassName="text-brand-orange"
               active={selectedCategory === category.slug}
               onClick={() => onSelectCategory(category.slug)}
+              bubble
             />
           ))}
         </div>
