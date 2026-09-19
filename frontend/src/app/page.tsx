@@ -10,7 +10,7 @@ export default function Home() {
       <Navbar />
 
       <div className="flex flex-1">
-        <aside className="w-80 shrink-0 border-r-4 border-brand-maroon bg-background">
+        <aside className="w-80 shrink-0 bg-background">
           <div className="sticky top-16 p-6">
             <Sidebar />
           </div>
