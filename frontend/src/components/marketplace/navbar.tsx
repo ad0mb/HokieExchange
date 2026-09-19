@@ -8,10 +8,16 @@ export function Navbar() {
         <Logo />
 
         <div className="flex items-center gap-3">
-          <Button className="font-heading bg-brand-maroon text-white hover:bg-brand-maroon-dark">
+          <Button
+            size="lg"
+            className="font-heading bg-brand-maroon px-6 text-base text-white hover:bg-brand-maroon-dark"
+          >
             Log In
           </Button>
-          <a href="#" className="text-sm text-brand-orange hover:underline">
+          <a
+            href="#"
+            className="font-heading text-xs font-bold text-brand-orange underline underline-offset-2 hover:text-brand-maroon"
+          >
             Forgot Account?
           </a>
         </div>
