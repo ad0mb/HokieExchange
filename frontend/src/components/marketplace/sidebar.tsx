@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Grid2x2, UserRound, type LucideIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -50,10 +51,10 @@ function SidebarLink({
   }
 
   return (
-    <a href={href ?? "#"} className={className}>
+    <Link href={href ?? "#"} className={className}>
       {iconEl}
       {label}
-    </a>
+    </Link>
   );
 }
 
@@ -94,7 +95,7 @@ export function Sidebar({
             onSelectLocation(null);
           }}
         />
-        <SidebarLink href="#" icon={UserRound} label="VT account" iconClassName="text-brand-maroon" />
+        <SidebarLink href="/account" icon={UserRound} label="VT account" iconClassName="text-brand-maroon" />
       </nav>
 
       <CreateListingDialog onCreate={onCreateListing} />
