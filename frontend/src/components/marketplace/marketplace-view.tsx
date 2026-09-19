@@ -4,10 +4,22 @@ import { useState } from "react";
 import { Sidebar } from "@/components/marketplace/sidebar";
 import { LocationBadge } from "@/components/marketplace/location-badge";
 import { ServiceCard } from "@/components/marketplace/service-card";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { categories } from "@/lib/categories";
 import { services as initialServices, type Service } from "@/lib/services";
 
-export function MarketplaceView() {
+export function MarketplaceView({
+  mobileMenuOpen,
+  onMobileMenuOpenChange,
+}: {
+  mobileMenuOpen: boolean;
+  onMobileMenuOpenChange: (open: boolean) => void;
+}) {
   const [services, setServices] = useState<Service[]>(initialServices);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
@@ -20,19 +32,30 @@ export function MarketplaceView() {
       (!selectedLocation || s.location === selectedLocation)
   );
 
+  const sidebar = (
+    <Sidebar
+      selectedCategory={selectedCategory}
+      onSelectCategory={setSelectedCategory}
+      selectedLocation={selectedLocation}
+      onSelectLocation={setSelectedLocation}
+      onCreateListing={(service) => setServices((prev) => [service, ...prev])}
+    />
+  );
+
   return (
     <div className="flex flex-1 flex-col lg:flex-row">
-      <aside className="w-full shrink-0 bg-background lg:w-80">
-        <div className="p-6 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto">
-          <Sidebar
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-            selectedLocation={selectedLocation}
-            onSelectLocation={setSelectedLocation}
-            onCreateListing={(service) =>
-              setServices((prev) => [service, ...prev])
-            }
-          />
+      <Sheet open={mobileMenuOpen} onOpenChange={onMobileMenuOpenChange}>
+        <SheetContent side="left" className="w-80 gap-0 p-0 lg:hidden">
+          <SheetHeader className="border-b">
+            <SheetTitle>Menu</SheetTitle>
+          </SheetHeader>
+          <div className="overflow-y-auto p-6">{sidebar}</div>
+        </SheetContent>
+      </Sheet>
+
+      <aside className="hidden shrink-0 bg-background lg:block lg:w-80">
+        <div className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto p-6">
+          {sidebar}
         </div>
       </aside>
 
@@ -42,7 +65,7 @@ export function MarketplaceView() {
           <LocationBadge />
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
           {visibleServices.map((service) => (
             <ServiceCard key={service.id} service={service} />
           ))}
