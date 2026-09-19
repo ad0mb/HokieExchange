@@ -53,7 +53,7 @@ export function MarketplaceView({
         </SheetContent>
       </Sheet>
 
-      <aside className="hidden shrink-0 bg-background lg:block lg:w-80">
+      <aside className="hidden shrink-0 bg-background lg:block lg:w-[22rem]">
         <div className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto p-6">
           {sidebar}
         </div>
