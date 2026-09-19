@@ -25,7 +25,7 @@ export const services: Service[] = [
   {
     id: "2",
     title: "Personal Training Session",
-    categorySlug: "beauty",
+    categorySlug: "fitness",
     price: 20,
     priceUnit: "per hour",
     sellerName: "Jordan P.",
