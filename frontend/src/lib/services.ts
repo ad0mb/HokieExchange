@@ -1,3 +1,5 @@
+import type { SlotStart } from "@/lib/availability";
+
 export type Service = {
   id: string;
   title: string;
@@ -8,6 +10,8 @@ export type Service = {
   sellerInitials: string;
   description: string;
   location: string;
+  imageUrl?: string;
+  bookingTimes?: SlotStart[];
 };
 
 export const services: Service[] = [
