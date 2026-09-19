@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { BookingDialog } from "@/components/marketplace/booking-dialog";
 import { categories } from "@/lib/categories";
 import type { Service } from "@/lib/services";
 
@@ -6,10 +7,7 @@ export function ServiceCard({ service }: { service: Service }) {
   const Icon = categories.find((c) => c.slug === service.categorySlug)!.icon;
 
   return (
-    <a
-      href={`/services/${service.id}`}
-      className="group flex flex-col overflow-hidden rounded-lg border bg-background transition-shadow hover:shadow-md"
-    >
+    <div className="group flex flex-col overflow-hidden rounded-lg border bg-background transition-shadow hover:shadow-md">
       <div className="flex aspect-square items-center justify-center bg-secondary">
         <Icon
           className="h-10 w-10 text-brand-maroon/70 transition-transform group-hover:scale-110"
@@ -40,11 +38,9 @@ export function ServiceCard({ service }: { service: Service }) {
               {service.sellerName}
             </span>
           </div>
-          <span className="text-xs font-semibold text-brand-maroon group-hover:underline">
-            Book here
-          </span>
+          <BookingDialog serviceTitle={service.title} />
         </div>
       </div>
-    </a>
+    </div>
   );
 }
