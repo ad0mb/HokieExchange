@@ -4,36 +4,68 @@ import { useState } from "react";
 import { Sidebar } from "@/components/marketplace/sidebar";
 import { LocationBadge } from "@/components/marketplace/location-badge";
 import { ServiceCard } from "@/components/marketplace/service-card";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { categories } from "@/lib/categories";
-import { services } from "@/lib/services";
+import { services as initialServices, type Service } from "@/lib/services";
 
-export function MarketplaceView() {
+export function MarketplaceView({
+  mobileMenuOpen,
+  onMobileMenuOpenChange,
+}: {
+  mobileMenuOpen: boolean;
+  onMobileMenuOpenChange: (open: boolean) => void;
+}) {
+  const [services, setServices] = useState<Service[]>(initialServices);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
 
   const heading =
     categories.find((c) => c.slug === selectedCategory)?.label ?? "Recommended";
-  const visibleServices = selectedCategory
-    ? services.filter((s) => s.categorySlug === selectedCategory)
-    : services;
+  const visibleServices = services.filter(
+    (s) =>
+      (!selectedCategory || s.categorySlug === selectedCategory) &&
+      (!selectedLocation || s.location === selectedLocation)
+  );
+
+  const sidebar = (
+    <Sidebar
+      selectedCategory={selectedCategory}
+      onSelectCategory={setSelectedCategory}
+      selectedLocation={selectedLocation}
+      onSelectLocation={setSelectedLocation}
+      onCreateListing={(service) => setServices((prev) => [service, ...prev])}
+    />
+  );
 
   return (
-    <div className="flex flex-1">
-      <aside className="w-80 shrink-0 bg-background">
-        <div className="sticky top-16 p-6">
-          <Sidebar
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-          />
+    <div className="flex flex-1 flex-col lg:flex-row">
+      <Sheet open={mobileMenuOpen} onOpenChange={onMobileMenuOpenChange}>
+        <SheetContent side="left" className="w-80 gap-0 p-0 lg:hidden">
+          <SheetHeader className="border-b">
+            <SheetTitle>Menu</SheetTitle>
+          </SheetHeader>
+          <div className="overflow-y-auto p-6">{sidebar}</div>
+        </SheetContent>
+      </Sheet>
+
+      <aside className="hidden shrink-0 bg-background lg:block lg:w-[22rem]">
+        <div className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto p-6">
+          {sidebar}
         </div>
       </aside>
 
-      <main className="min-w-0 flex-1 bg-secondary px-6 py-6">
-        <div className="mb-4 flex items-center justify-between gap-4">
+      <main className="min-w-0 flex-1 bg-secondary px-4 py-6 sm:px-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
           <h1 className="text-xl font-bold text-brand-orange">{heading}</h1>
           <LocationBadge />
         </div>
 
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
           {visibleServices.map((service) => (
             <ServiceCard key={service.id} service={service} />
           ))}

@@ -1,11 +1,13 @@
 "use client";
 
-import { Search, Grid2x2, UserRound, CirclePlus, type LucideIcon } from "lucide-react";
+import { Grid2x2, UserRound, type LucideIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { CreateListingDialog } from "@/components/marketplace/create-listing-dialog";
+import { VTIcon } from "@/components/VTIcon";
 import { cn } from "@/lib/utils";
 import { categories } from "@/lib/categories";
+import { locations, type Service } from "@/lib/services";
 
 function SidebarLink({
   icon: Icon,
@@ -14,6 +16,7 @@ function SidebarLink({
   active,
   href,
   onClick,
+  bubble,
 }: {
   icon: LucideIcon;
   label: string;
@@ -21,16 +24,26 @@ function SidebarLink({
   active?: boolean;
   href?: string;
   onClick?: () => void;
+  bubble?: boolean;
 }) {
   const className = cn(
-    "flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium hover:bg-accent",
+    "flex items-center gap-3 rounded-md px-2 hover:bg-accent",
+    bubble ? "py-2 text-base font-medium" : "py-2 text-sm font-medium",
     active && "bg-accent"
+  );
+
+  const iconEl = bubble ? (
+    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary">
+      <Icon className={cn("h-5 w-5", iconClassName)} />
+    </span>
+  ) : (
+    <Icon className={cn("h-5 w-5 shrink-0", iconClassName)} />
   );
 
   if (onClick) {
     return (
       <button type="button" onClick={onClick} className={className}>
-        <Icon className={cn("h-5 w-5", iconClassName)} />
+        {iconEl}
         {label}
       </button>
     );
@@ -38,7 +51,7 @@ function SidebarLink({
 
   return (
     <a href={href ?? "#"} className={className}>
-      <Icon className={cn("h-5 w-5", iconClassName)} />
+      {iconEl}
       {label}
     </a>
   );
@@ -47,14 +60,23 @@ function SidebarLink({
 export function Sidebar({
   selectedCategory,
   onSelectCategory,
+  selectedLocation,
+  onSelectLocation,
+  onCreateListing,
 }: {
   selectedCategory: string | null;
   onSelectCategory: (slug: string | null) => void;
+  selectedLocation: string | null;
+  onSelectLocation: (location: string | null) => void;
+  onCreateListing: (service: Service) => void;
 }) {
   return (
     <div className="flex h-full flex-col gap-4">
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-orange" />
+        <VTIcon
+          name="hokie-feet"
+          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+        />
         <Input
           placeholder="Search Exchange"
           className="pl-9 placeholder:text-brand-orange"
@@ -66,27 +88,52 @@ export function Sidebar({
           icon={Grid2x2}
           label="Browse all"
           iconClassName="text-brand-maroon"
-          active={selectedCategory === null}
-          onClick={() => onSelectCategory(null)}
+          active={selectedCategory === null && selectedLocation === null}
+          onClick={() => {
+            onSelectCategory(null);
+            onSelectLocation(null);
+          }}
         />
         <SidebarLink href="#" icon={UserRound} label="VT account" iconClassName="text-brand-maroon" />
       </nav>
 
-      <Button
-        variant="outline"
-        className="font-heading justify-start gap-2 border-brand-maroon text-brand-maroon hover:bg-brand-maroon hover:text-white"
-      >
-        <CirclePlus className="h-4 w-4" />
-        Create new listing
-      </Button>
+      <CreateListingDialog onCreate={onCreateListing} />
 
       <Separator />
 
-      <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex flex-col">
+        <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground">
+          Locations
+        </h3>
+        <div className="flex flex-wrap gap-2 px-2">
+          {locations.map((location) => {
+            const active = selectedLocation === location;
+            return (
+              <button
+                key={location}
+                type="button"
+                onClick={() => onSelectLocation(active ? null : location)}
+                className={cn(
+                  "rounded-full border px-3 py-1 text-xs font-medium",
+                  active
+                    ? "border-brand-orange bg-brand-orange text-white"
+                    : "border-brand-maroon text-brand-maroon"
+                )}
+              >
+                {location}, VA
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="flex flex-col">
         <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground">
           Categories
         </h3>
-        <div className="flex flex-col gap-0.5 overflow-y-auto pr-1">
+        <div className="flex flex-col gap-1">
           {categories.map((category) => (
             <SidebarLink
               key={category.slug}
@@ -95,6 +142,7 @@ export function Sidebar({
               iconClassName="text-brand-orange"
               active={selectedCategory === category.slug}
               onClick={() => onSelectCategory(category.slug)}
+              bubble
             />
           ))}
         </div>

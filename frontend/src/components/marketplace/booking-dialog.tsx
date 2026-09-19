@@ -8,10 +8,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { getUpcomingAvailability } from "@/lib/availability";
+import { getUpcomingAvailability, type SlotStart } from "@/lib/availability";
 
-export function BookingDialog({ serviceTitle }: { serviceTitle: string }) {
-  const availability = getUpcomingAvailability();
+export function BookingDialog({
+  serviceTitle,
+  bookingTimes,
+}: {
+  serviceTitle: string;
+  bookingTimes?: SlotStart[];
+}) {
+  const availability = getUpcomingAvailability(7, bookingTimes);
 
   return (
     <Dialog>

@@ -8,11 +8,20 @@ export function ServiceCard({ service }: { service: Service }) {
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-lg border bg-background transition-shadow hover:shadow-md">
-      <div className="flex aspect-square items-center justify-center bg-secondary">
-        <Icon
-          className="h-10 w-10 text-brand-maroon/70 transition-transform group-hover:scale-110"
-          strokeWidth={1.5}
-        />
+      <div className="flex aspect-square items-center justify-center overflow-hidden bg-secondary">
+        {service.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- client-only object URL preview, not a static/remote asset
+          <img
+            src={service.imageUrl}
+            alt={service.title}
+            className="h-full w-full object-cover transition-transform group-hover:scale-110"
+          />
+        ) : (
+          <Icon
+            className="h-10 w-10 text-brand-maroon/70 transition-transform group-hover:scale-110"
+            strokeWidth={1.5}
+          />
+        )}
       </div>
 
       <div className="flex flex-1 flex-col gap-1 p-2.5">
@@ -23,6 +32,7 @@ export function ServiceCard({ service }: { service: Service }) {
           </span>
         </p>
         <h3 className="line-clamp-1 text-sm font-semibold">{service.title}</h3>
+        <p className="text-[11px] text-muted-foreground">{service.location}</p>
         <p className="line-clamp-1 text-xs text-muted-foreground">
           {service.description}
         </p>
@@ -38,7 +48,10 @@ export function ServiceCard({ service }: { service: Service }) {
               {service.sellerName}
             </span>
           </div>
-          <BookingDialog serviceTitle={service.title} />
+          <BookingDialog
+            serviceTitle={service.title}
+            bookingTimes={service.bookingTimes}
+          />
         </div>
       </div>
     </div>

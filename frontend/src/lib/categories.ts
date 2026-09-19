@@ -9,6 +9,7 @@ import {
   Building2,
   ShoppingCart,
   Flower2,
+  Dumbbell,
   type LucideIcon,
 } from "lucide-react";
 
@@ -21,6 +22,7 @@ export type Category = {
 export const categories: Category[] = [
   { slug: "haircut", label: "Haircut", icon: Scissors },
   { slug: "beauty", label: "Beauty", icon: Sparkles },
+  { slug: "fitness", label: "Fitness", icon: Dumbbell },
   { slug: "food", label: "Food", icon: UtensilsCrossed },
   { slug: "landscaping", label: "Landscaping", icon: Trees },
   { slug: "cleaning", label: "Cleaning", icon: SprayCan },
