@@ -87,6 +87,10 @@ export function CreateListingDialog({
       setError("Enter a price greater than $0.");
       return;
     }
+    if (images.length === 0) {
+      setError("Add at least one image.");
+      return;
+    }
 
     onCreate({
       id: crypto.randomUUID(),
@@ -211,7 +215,9 @@ export function CreateListingDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor={`${formId}-images`}>Relevant images</Label>
+            <Label htmlFor={`${formId}-images`}>
+              Relevant images <span className="text-destructive">*</span>
+            </Label>
             <label
               htmlFor={`${formId}-images`}
               className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed px-2.5 py-2 text-sm text-muted-foreground hover:border-brand-maroon hover:text-brand-maroon"
