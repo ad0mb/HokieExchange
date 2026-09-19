@@ -1,0 +1,113 @@
+export type Service = {
+  id: string;
+  title: string;
+  categorySlug: string;
+  price: number;
+  priceUnit: string;
+  sellerName: string;
+  sellerInitials: string;
+  description: string;
+};
+
+export const services: Service[] = [
+  {
+    id: "1",
+    title: "Fried Chicken Plates",
+    categorySlug: "food",
+    price: 55,
+    priceUnit: "per order",
+    sellerName: "Marcus T.",
+    sellerInitials: "MT",
+    description: "Homemade fried chicken plates with sides, made to order.",
+  },
+  {
+    id: "2",
+    title: "Personal Training Session",
+    categorySlug: "beauty",
+    price: 20,
+    priceUnit: "per hour",
+    sellerName: "Jordan P.",
+    sellerInitials: "JP",
+    description: "1-on-1 strength training sessions at McComas.",
+  },
+  {
+    id: "3",
+    title: "Makeup & Nails",
+    categorySlug: "beauty",
+    price: 80,
+    priceUnit: "per session",
+    sellerName: "Ava R.",
+    sellerInitials: "AR",
+    description: "Full glam makeup and gel nails for events.",
+  },
+  {
+    id: "4",
+    title: "Fresh Fade Haircuts",
+    categorySlug: "haircut",
+    price: 15,
+    priceUnit: "per cut",
+    sellerName: "Devon L.",
+    sellerInitials: "DL",
+    description: "Clean fades and line-ups, walk-ins welcome near Hethwood.",
+  },
+  {
+    id: "5",
+    title: "Apartment Deep Clean",
+    categorySlug: "cleaning",
+    price: 40,
+    priceUnit: "per visit",
+    sellerName: "Priya S.",
+    sellerInitials: "PS",
+    description: "Full apartment cleaning, move-out ready in under 3 hours.",
+  },
+  {
+    id: "6",
+    title: "CS 2114 Textbook Bundle",
+    categorySlug: "textbooks",
+    price: 35,
+    priceUnit: "flat rate",
+    sellerName: "Ethan W.",
+    sellerInitials: "EW",
+    description: "Barely used bundle, includes lab manual and notes.",
+  },
+  {
+    id: "7",
+    title: "Sublease Near Union",
+    categorySlug: "subleasing",
+    price: 650,
+    priceUnit: "per month",
+    sellerName: "Grace K.",
+    sellerInitials: "GK",
+    description: "1BR sublease available for spring semester, pet friendly.",
+  },
+  {
+    id: "8",
+    title: "Custom Bouquets",
+    categorySlug: "flowers",
+    price: 25,
+    priceUnit: "per bouquet",
+    sellerName: "Lily N.",
+    sellerInitials: "LN",
+    description: "Fresh seasonal bouquets, same-day delivery on campus.",
+  },
+  {
+    id: "9",
+    title: "Lawn Mowing & Yard Work",
+    categorySlug: "landscaping",
+    price: 30,
+    priceUnit: "per yard",
+    sellerName: "Sam B.",
+    sellerInitials: "SB",
+    description: "Weekly mowing and trimming for off-campus houses.",
+  },
+  {
+    id: "10",
+    title: "Airport & Store Runs",
+    categorySlug: "shopping",
+    price: 18,
+    priceUnit: "per trip",
+    sellerName: "Noah F.",
+    sellerInitials: "NF",
+    description: "Rides to ROA airport, Kroger, and Target runs on request.",
+  },
+];
