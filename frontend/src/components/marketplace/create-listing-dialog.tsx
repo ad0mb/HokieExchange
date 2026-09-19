@@ -79,6 +79,10 @@ export function CreateListingDialog({
       setError("Give your listing a title.");
       return;
     }
+    if (!description.trim()) {
+      setError("Add a description.");
+      return;
+    }
     if (!price || Number.isNaN(priceValue) || priceValue <= 0) {
       setError("Enter a price greater than $0.");
       return;
@@ -130,7 +134,9 @@ export function CreateListingDialog({
           className="max-h-[60vh] space-y-4 overflow-y-auto px-1 pb-1"
         >
           <div className="space-y-1.5">
-            <Label htmlFor={`${formId}-title`}>Title</Label>
+            <Label htmlFor={`${formId}-title`}>
+              Title <span className="text-destructive">*</span>
+            </Label>
             <Input
               id={`${formId}-title`}
               value={title}
@@ -141,7 +147,9 @@ export function CreateListingDialog({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor={`${formId}-category`}>Category</Label>
+              <Label htmlFor={`${formId}-category`}>
+                Category <span className="text-destructive">*</span>
+              </Label>
               <select
                 id={`${formId}-category`}
                 value={categorySlug}
@@ -157,7 +165,9 @@ export function CreateListingDialog({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor={`${formId}-location`}>Location</Label>
+              <Label htmlFor={`${formId}-location`}>
+                Location <span className="text-destructive">*</span>
+              </Label>
               <select
                 id={`${formId}-location`}
                 value={location}
@@ -174,7 +184,9 @@ export function CreateListingDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor={`${formId}-price`}>Price ($)</Label>
+            <Label htmlFor={`${formId}-price`}>
+              Price ($) <span className="text-destructive">*</span>
+            </Label>
             <Input
               id={`${formId}-price`}
               type="number"
@@ -187,7 +199,9 @@ export function CreateListingDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor={`${formId}-description`}>Description</Label>
+            <Label htmlFor={`${formId}-description`}>
+              Description <span className="text-destructive">*</span>
+            </Label>
             <Textarea
               id={`${formId}-description`}
               value={description}
