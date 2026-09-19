@@ -1,9 +1,10 @@
 "use client";
 
-import { Search, Grid2x2, UserRound, type LucideIcon } from "lucide-react";
+import { Grid2x2, UserRound, type LucideIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { CreateListingDialog } from "@/components/marketplace/create-listing-dialog";
+import { VTIcon } from "@/components/VTIcon";
 import { cn } from "@/lib/utils";
 import { categories } from "@/lib/categories";
 import { locations, type Service } from "@/lib/services";
@@ -72,7 +73,10 @@ export function Sidebar({
   return (
     <div className="flex h-full flex-col gap-4">
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-orange" />
+        <VTIcon
+          name="hokie-feet"
+          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+        />
         <Input
           placeholder="Search Exchange"
           className="pl-9 placeholder:text-brand-orange"
