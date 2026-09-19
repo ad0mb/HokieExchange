@@ -11,10 +11,7 @@ export function Navbar() {
           <Button className="font-heading bg-brand-maroon text-white hover:bg-brand-maroon-dark">
             Log In
           </Button>
-          <a
-            href="#"
-            className="text-sm text-muted-foreground hover:text-foreground hover:underline"
-          >
+          <a href="#" className="text-sm text-brand-orange hover:underline">
             Forgot Account?
           </a>
         </div>

@@ -31,8 +31,11 @@ export function Sidebar() {
   return (
     <div className="flex h-full flex-col gap-4">
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input placeholder="Search Exchange" className="pl-9" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-orange" />
+        <Input
+          placeholder="Search Exchange"
+          className="pl-9 placeholder:text-brand-orange"
+        />
       </div>
 
       <nav className="flex flex-col gap-1">
