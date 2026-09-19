@@ -7,3 +7,9 @@ requires-python = ">=3.14"
 dependencies = [
     "fastapi[standard]>=0.141.1",
 ]
+
+[dependency-groups]
+dev = [
+    "pymysql>=1.2.3",
+    "sqlacodegen>=4.0.4",
+]
