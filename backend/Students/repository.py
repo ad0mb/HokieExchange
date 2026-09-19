@@ -1,0 +1,28 @@
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from Students.models import Student
+from Students.schemas import StudentUpdate
+
+
+class StudentRepository:
+    def __init__(self, db: Session) -> None:
+        self.db = db
+
+    def get_by_id(self, student_id: int) -> Student | None:
+        return self.db.get(Student, student_id)
+
+    def get_all(self) -> list[Student]:
+        return list(self.db.scalars(select(Student)).all())
+
+    def update(self, student: Student, data: StudentUpdate) -> Student:
+        for field, value in data.model_dump(exclude_unset=True).items():
+            setattr(student, field, value)
+
+        self.db.commit()
+        self.db.refresh(student)
+        return student
+
+    def delete(self, student: Student) -> None:
+        self.db.delete(student)
+        self.db.commit()
