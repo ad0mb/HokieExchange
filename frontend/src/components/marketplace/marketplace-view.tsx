@@ -21,9 +21,9 @@ export function MarketplaceView() {
   );
 
   return (
-    <div className="flex flex-1">
-      <aside className="w-80 shrink-0 bg-background">
-        <div className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto p-6">
+    <div className="flex flex-1 flex-col lg:flex-row">
+      <aside className="w-full shrink-0 bg-background lg:w-80">
+        <div className="p-6 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto">
           <Sidebar
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
@@ -36,13 +36,13 @@ export function MarketplaceView() {
         </div>
       </aside>
 
-      <main className="min-w-0 flex-1 bg-secondary px-6 py-6">
-        <div className="mb-4 flex items-center justify-between gap-4">
+      <main className="min-w-0 flex-1 bg-secondary px-4 py-6 sm:px-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
           <h1 className="text-xl font-bold text-brand-orange">{heading}</h1>
           <LocationBadge />
         </div>
 
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
           {visibleServices.map((service) => (
             <ServiceCard key={service.id} service={service} />
           ))}
