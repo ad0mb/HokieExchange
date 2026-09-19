@@ -22,7 +22,7 @@ export function MarketplaceView() {
   return (
     <div className="flex flex-1">
       <aside className="w-80 shrink-0 bg-background">
-        <div className="sticky top-16 p-6">
+        <div className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto p-6">
           <Sidebar
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
