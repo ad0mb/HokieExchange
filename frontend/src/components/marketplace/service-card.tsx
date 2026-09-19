@@ -23,6 +23,7 @@ export function ServiceCard({ service }: { service: Service }) {
           </span>
         </p>
         <h3 className="line-clamp-1 text-sm font-semibold">{service.title}</h3>
+        <p className="text-[11px] text-muted-foreground">{service.location}</p>
         <p className="line-clamp-1 text-xs text-muted-foreground">
           {service.description}
         </p>
