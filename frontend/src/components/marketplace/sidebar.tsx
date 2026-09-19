@@ -42,7 +42,7 @@ export function Sidebar() {
 
       <Button
         variant="outline"
-        className="justify-start gap-2 border-brand-maroon text-brand-maroon hover:bg-brand-maroon hover:text-white"
+        className="font-heading justify-start gap-2 border-brand-maroon text-brand-maroon hover:bg-brand-maroon hover:text-white"
       >
         <CirclePlus className="h-4 w-4" />
         Create new listing

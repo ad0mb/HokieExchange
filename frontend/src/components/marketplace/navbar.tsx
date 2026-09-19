@@ -8,7 +8,7 @@ export function Navbar() {
         <Logo />
 
         <div className="flex items-center gap-3">
-          <Button className="bg-brand-maroon text-white hover:bg-brand-maroon-dark">
+          <Button className="font-heading bg-brand-maroon text-white hover:bg-brand-maroon-dark">
             Log In
           </Button>
           <a
