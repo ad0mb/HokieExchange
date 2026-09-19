@@ -2,5 +2,5 @@
 
 ## Tech Stack
 
--**Frameworks**: Next.js
+- **Frameworks**: Next.js
 - **Database**: MySQL/DataBricks
