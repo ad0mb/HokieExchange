@@ -29,7 +29,7 @@ export function MarketplaceView() {
 
       <main className="min-w-0 flex-1 bg-secondary px-6 py-6">
         <div className="mb-4 flex items-center justify-between gap-4">
-          <h1 className="text-xl font-bold">{heading}</h1>
+          <h1 className="text-xl font-bold text-brand-orange">{heading}</h1>
           <LocationBadge />
         </div>
 
