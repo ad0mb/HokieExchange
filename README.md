@@ -4,5 +4,5 @@
 
 ## Tech Stack
 
-- **Frameworks**: Next.js
+- **Frameworks**: Next.js, FastAPI
 - **Database**: MySQL/DataBricks
