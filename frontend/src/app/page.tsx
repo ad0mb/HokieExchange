@@ -6,12 +6,12 @@ import { services } from "@/lib/services";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-secondary">
       <Navbar />
 
       <div className="mx-auto flex w-full max-w-[1400px] flex-1 gap-6 px-6 py-6">
         <aside className="w-64 shrink-0">
-          <div className="sticky top-22">
+          <div className="sticky top-22 rounded-lg border bg-background p-4">
             <Sidebar />
           </div>
         </aside>

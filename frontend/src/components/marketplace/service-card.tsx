@@ -8,7 +8,7 @@ export function ServiceCard({ service }: { service: Service }) {
   return (
     <a
       href={`/services/${service.id}`}
-      className="group flex flex-col overflow-hidden rounded-lg border transition-shadow hover:shadow-md"
+      className="group flex flex-col overflow-hidden rounded-lg border bg-background transition-shadow hover:shadow-md"
     >
       <div className="flex aspect-square items-center justify-center bg-secondary">
         <Icon
