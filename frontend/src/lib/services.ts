@@ -2,7 +2,6 @@ export type Service = {
   id: string;
   title: string;
   categorySlug: string;
-  categoryLabel: string;
   price: number;
   priceUnit: string;
   sellerName: string;
@@ -15,7 +14,6 @@ export const services: Service[] = [
     id: "1",
     title: "Fried Chicken Plates",
     categorySlug: "food",
-    categoryLabel: "Food",
     price: 55,
     priceUnit: "per order",
     sellerName: "Marcus T.",
@@ -26,7 +24,6 @@ export const services: Service[] = [
     id: "2",
     title: "Personal Training Session",
     categorySlug: "beauty",
-    categoryLabel: "Fitness",
     price: 20,
     priceUnit: "per hour",
     sellerName: "Jordan P.",
@@ -37,7 +34,6 @@ export const services: Service[] = [
     id: "3",
     title: "Makeup & Nails",
     categorySlug: "beauty",
-    categoryLabel: "Beauty",
     price: 80,
     priceUnit: "per session",
     sellerName: "Ava R.",
@@ -48,7 +44,6 @@ export const services: Service[] = [
     id: "4",
     title: "Fresh Fade Haircuts",
     categorySlug: "haircut",
-    categoryLabel: "Haircut",
     price: 15,
     priceUnit: "per cut",
     sellerName: "Devon L.",
@@ -59,7 +54,6 @@ export const services: Service[] = [
     id: "5",
     title: "Apartment Deep Clean",
     categorySlug: "cleaning",
-    categoryLabel: "Cleaning",
     price: 40,
     priceUnit: "per visit",
     sellerName: "Priya S.",
@@ -70,7 +64,6 @@ export const services: Service[] = [
     id: "6",
     title: "CS 2114 Textbook Bundle",
     categorySlug: "textbooks",
-    categoryLabel: "Textbooks",
     price: 35,
     priceUnit: "flat rate",
     sellerName: "Ethan W.",
@@ -81,7 +74,6 @@ export const services: Service[] = [
     id: "7",
     title: "Sublease Near Union",
     categorySlug: "subleasing",
-    categoryLabel: "Subleasing",
     price: 650,
     priceUnit: "per month",
     sellerName: "Grace K.",
@@ -92,7 +84,6 @@ export const services: Service[] = [
     id: "8",
     title: "Custom Bouquets",
     categorySlug: "flowers",
-    categoryLabel: "Flowers",
     price: 25,
     priceUnit: "per bouquet",
     sellerName: "Lily N.",
@@ -103,7 +94,6 @@ export const services: Service[] = [
     id: "9",
     title: "Lawn Mowing & Yard Work",
     categorySlug: "landscaping",
-    categoryLabel: "Landscaping",
     price: 30,
     priceUnit: "per yard",
     sellerName: "Sam B.",
@@ -114,7 +104,6 @@ export const services: Service[] = [
     id: "10",
     title: "Airport & Store Runs",
     categorySlug: "shopping",
-    categoryLabel: "Shopping",
     price: 18,
     priceUnit: "per trip",
     sellerName: "Noah F.",
