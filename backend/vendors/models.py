@@ -25,3 +25,9 @@ class Vendor(Base):
     services: Mapped[list["Service"]] = relationship(
         "Service", back_populates="vendor", passive_deletes=True
     )
+    consumer_ratings: Mapped[list["ConsumerRating"]] = relationship(
+        "ConsumerRating", back_populates="vendor", passive_deletes=True
+    )
+    vendor_ratings: Mapped[list["VendorRating"]] = relationship(
+        "VendorRating", back_populates="vendor", passive_deletes=True
+    )

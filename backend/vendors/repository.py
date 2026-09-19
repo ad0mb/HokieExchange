@@ -1,8 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from Vendors.models import Vendor
-from Vendors.schemas import VendorUpdate
+from vendors.models import Vendor
+from vendors.schemas import VendorUpdate
 
 
 class VendorRepository:

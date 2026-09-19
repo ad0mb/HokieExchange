@@ -1,8 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from Students.models import Student
-from Students.schemas import StudentUpdate
+from students.models import Student
+from students.schemas import StudentUpdate
 
 
 class StudentRepository:

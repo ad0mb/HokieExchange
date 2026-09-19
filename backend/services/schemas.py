@@ -33,22 +33,41 @@ class ServiceRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class TimeBlockCreate(BaseModel):
+class TimeBlockConfigCreate(BaseModel):
     service_id: int
     duration: datetime.time
     price: decimal.Decimal
 
 
-class TimeBlockUpdate(BaseModel):
+class TimeBlockConfigUpdate(BaseModel):
     duration: Optional[datetime.time] = None
     price: Optional[decimal.Decimal] = None
 
 
-class TimeBlockRead(BaseModel):
+class TimeBlockConfigRead(BaseModel):
     config_id: int
     service_id: int
     duration: datetime.time
     price: decimal.Decimal
+    date_created: Optional[datetime.datetime]
+    date_updated: Optional[datetime.datetime]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TimeBlockCreate(BaseModel):
+    config_id: int
+    start_time: datetime.datetime
+
+
+class TimeBlockUpdate(BaseModel):
+    start_time: Optional[datetime.datetime] = None
+
+
+class TimeBlockRead(BaseModel):
+    time_block_id: int
+    config_id: int
+    start_time: datetime.datetime
     date_created: Optional[datetime.datetime]
     date_updated: Optional[datetime.datetime]
 
