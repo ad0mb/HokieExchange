@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { categories } from "@/lib/categories";
+import { locations } from "@/lib/services";
 
 function SidebarLink({
   icon: Icon,
@@ -47,9 +48,13 @@ function SidebarLink({
 export function Sidebar({
   selectedCategory,
   onSelectCategory,
+  selectedLocation,
+  onSelectLocation,
 }: {
   selectedCategory: string | null;
   onSelectCategory: (slug: string | null) => void;
+  selectedLocation: string | null;
+  onSelectLocation: (location: string | null) => void;
 }) {
   return (
     <div className="flex h-full flex-col gap-4">
@@ -66,8 +71,11 @@ export function Sidebar({
           icon={Grid2x2}
           label="Browse all"
           iconClassName="text-brand-maroon"
-          active={selectedCategory === null}
-          onClick={() => onSelectCategory(null)}
+          active={selectedCategory === null && selectedLocation === null}
+          onClick={() => {
+            onSelectCategory(null);
+            onSelectLocation(null);
+          }}
         />
         <SidebarLink href="#" icon={UserRound} label="VT account" iconClassName="text-brand-maroon" />
       </nav>
@@ -82,11 +90,11 @@ export function Sidebar({
 
       <Separator />
 
-      <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex flex-col">
         <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground">
           Categories
         </h3>
-        <div className="flex flex-col gap-0.5 overflow-y-auto pr-1">
+        <div className="flex flex-col gap-0.5">
           {categories.map((category) => (
             <SidebarLink
               key={category.slug}
@@ -97,6 +105,34 @@ export function Sidebar({
               onClick={() => onSelectCategory(category.slug)}
             />
           ))}
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="flex flex-col">
+        <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground">
+          Locations
+        </h3>
+        <div className="flex flex-wrap gap-2 px-2">
+          {locations.map((location) => {
+            const active = selectedLocation === location;
+            return (
+              <button
+                key={location}
+                type="button"
+                onClick={() => onSelectLocation(active ? null : location)}
+                className={cn(
+                  "rounded-full border px-3 py-1 text-xs font-medium",
+                  active
+                    ? "border-brand-orange text-brand-orange"
+                    : "border-brand-maroon text-brand-maroon"
+                )}
+              >
+                {location}, VA
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

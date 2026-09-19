@@ -9,12 +9,15 @@ import { services } from "@/lib/services";
 
 export function MarketplaceView() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
 
   const heading =
     categories.find((c) => c.slug === selectedCategory)?.label ?? "Recommended";
-  const visibleServices = selectedCategory
-    ? services.filter((s) => s.categorySlug === selectedCategory)
-    : services;
+  const visibleServices = services.filter(
+    (s) =>
+      (!selectedCategory || s.categorySlug === selectedCategory) &&
+      (!selectedLocation || s.location === selectedLocation)
+  );
 
   return (
     <div className="flex flex-1">
@@ -23,6 +26,8 @@ export function MarketplaceView() {
           <Sidebar
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
+            selectedLocation={selectedLocation}
+            onSelectLocation={setSelectedLocation}
           />
         </div>
       </aside>

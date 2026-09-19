@@ -166,3 +166,7 @@ export const services: Service[] = [
     location: "Salem",
   },
 ];
+
+export const locations: string[] = Array.from(
+  new Set(services.map((s) => s.location))
+);
