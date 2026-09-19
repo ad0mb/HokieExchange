@@ -92,26 +92,6 @@ export function Sidebar({
 
       <div className="flex flex-col">
         <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground">
-          Categories
-        </h3>
-        <div className="flex flex-col gap-0.5">
-          {categories.map((category) => (
-            <SidebarLink
-              key={category.slug}
-              icon={category.icon}
-              label={category.label}
-              iconClassName="text-brand-orange"
-              active={selectedCategory === category.slug}
-              onClick={() => onSelectCategory(category.slug)}
-            />
-          ))}
-        </div>
-      </div>
-
-      <Separator />
-
-      <div className="flex flex-col">
-        <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground">
           Locations
         </h3>
         <div className="flex flex-wrap gap-2 px-2">
@@ -125,7 +105,7 @@ export function Sidebar({
                 className={cn(
                   "rounded-full border px-3 py-1 text-xs font-medium",
                   active
-                    ? "border-brand-orange text-brand-orange"
+                    ? "border-brand-orange bg-brand-orange text-white"
                     : "border-brand-maroon text-brand-maroon"
                 )}
               >
@@ -133,6 +113,26 @@ export function Sidebar({
               </button>
             );
           })}
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="flex flex-col">
+        <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground">
+          Categories
+        </h3>
+        <div className="flex flex-col gap-0.5">
+          {categories.map((category) => (
+            <SidebarLink
+              key={category.slug}
+              icon={category.icon}
+              label={category.label}
+              iconClassName="text-brand-orange"
+              active={selectedCategory === category.slug}
+              onClick={() => onSelectCategory(category.slug)}
+            />
+          ))}
         </div>
       </div>
     </div>
