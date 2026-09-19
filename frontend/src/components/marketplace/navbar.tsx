@@ -1,6 +1,7 @@
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/marketplace/logo";
+import { LoginDialog } from "@/components/marketplace/login-dialog";
 
 export function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
   return (
@@ -20,12 +21,7 @@ export function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <Button
-            size="lg"
-            className="font-heading bg-brand-maroon px-4 text-sm sm:px-6 sm:text-base text-white hover:bg-brand-maroon-dark"
-          >
-            Log In
-          </Button>
+          <LoginDialog />
           <a
             href="#"
             className="font-heading text-xs font-bold text-brand-orange no-underline hover:text-brand-maroon"
