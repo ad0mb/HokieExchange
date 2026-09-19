@@ -1,8 +1,31 @@
-import { Search, Grid2x2, UserRound, CirclePlus } from "lucide-react";
+import { Search, Grid2x2, UserRound, CirclePlus, type LucideIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 import { categories } from "@/lib/categories";
+
+function SidebarLink({
+  href,
+  icon: Icon,
+  label,
+  iconClassName,
+}: {
+  href: string;
+  icon: LucideIcon;
+  label: string;
+  iconClassName?: string;
+}) {
+  return (
+    <a
+      href={href}
+      className="flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium hover:bg-accent"
+    >
+      <Icon className={cn("h-5 w-5", iconClassName)} />
+      {label}
+    </a>
+  );
+}
 
 export function Sidebar() {
   return (
@@ -13,20 +36,8 @@ export function Sidebar() {
       </div>
 
       <nav className="flex flex-col gap-1">
-        <a
-          href="#"
-          className="flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium hover:bg-accent"
-        >
-          <Grid2x2 className="h-5 w-5 text-brand-maroon" />
-          Browse all
-        </a>
-        <a
-          href="#"
-          className="flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium hover:bg-accent"
-        >
-          <UserRound className="h-5 w-5 text-brand-maroon" />
-          VT account
-        </a>
+        <SidebarLink href="#" icon={Grid2x2} label="Browse all" iconClassName="text-brand-maroon" />
+        <SidebarLink href="#" icon={UserRound} label="VT account" iconClassName="text-brand-maroon" />
       </nav>
 
       <Button
@@ -45,14 +56,13 @@ export function Sidebar() {
         </h3>
         <div className="flex flex-col gap-0.5 overflow-y-auto pr-1">
           {categories.map((category) => (
-            <a
+            <SidebarLink
               key={category.slug}
               href={`#${category.slug}`}
-              className="flex items-center gap-3 rounded-md px-2 py-2 text-sm hover:bg-accent"
-            >
-              <category.icon className="h-5 w-5 text-brand-orange" />
-              {category.label}
-            </a>
+              icon={category.icon}
+              label={category.label}
+              iconClassName="text-brand-orange"
+            />
           ))}
         </div>
       </div>
