@@ -1,8 +1,9 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { categories } from "@/lib/categories";
 import type { Service } from "@/lib/services";
 
 export function ServiceCard({ service }: { service: Service }) {
-  const Icon = service.icon;
+  const Icon = categories.find((c) => c.slug === service.categorySlug)!.icon;
 
   return (
     <a

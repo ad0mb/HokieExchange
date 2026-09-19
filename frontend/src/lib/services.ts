@@ -1,17 +1,3 @@
-import {
-  Drumstick,
-  Dumbbell,
-  Palette,
-  Scissors,
-  SprayCan,
-  BookOpen,
-  Home,
-  Flower2,
-  Car,
-  Trees,
-  type LucideIcon,
-} from "lucide-react";
-
 export type Service = {
   id: string;
   title: string;
@@ -22,7 +8,6 @@ export type Service = {
   sellerName: string;
   sellerInitials: string;
   description: string;
-  icon: LucideIcon;
 };
 
 export const services: Service[] = [
@@ -36,7 +21,6 @@ export const services: Service[] = [
     sellerName: "Marcus T.",
     sellerInitials: "MT",
     description: "Homemade fried chicken plates with sides, made to order.",
-    icon: Drumstick,
   },
   {
     id: "2",
@@ -48,7 +32,6 @@ export const services: Service[] = [
     sellerName: "Jordan P.",
     sellerInitials: "JP",
     description: "1-on-1 strength training sessions at McComas.",
-    icon: Dumbbell,
   },
   {
     id: "3",
@@ -60,7 +43,6 @@ export const services: Service[] = [
     sellerName: "Ava R.",
     sellerInitials: "AR",
     description: "Full glam makeup and gel nails for events.",
-    icon: Palette,
   },
   {
     id: "4",
@@ -72,7 +54,6 @@ export const services: Service[] = [
     sellerName: "Devon L.",
     sellerInitials: "DL",
     description: "Clean fades and line-ups, walk-ins welcome near Hethwood.",
-    icon: Scissors,
   },
   {
     id: "5",
@@ -84,7 +65,6 @@ export const services: Service[] = [
     sellerName: "Priya S.",
     sellerInitials: "PS",
     description: "Full apartment cleaning, move-out ready in under 3 hours.",
-    icon: SprayCan,
   },
   {
     id: "6",
@@ -96,7 +76,6 @@ export const services: Service[] = [
     sellerName: "Ethan W.",
     sellerInitials: "EW",
     description: "Barely used bundle, includes lab manual and notes.",
-    icon: BookOpen,
   },
   {
     id: "7",
@@ -108,7 +87,6 @@ export const services: Service[] = [
     sellerName: "Grace K.",
     sellerInitials: "GK",
     description: "1BR sublease available for spring semester, pet friendly.",
-    icon: Home,
   },
   {
     id: "8",
@@ -120,7 +98,6 @@ export const services: Service[] = [
     sellerName: "Lily N.",
     sellerInitials: "LN",
     description: "Fresh seasonal bouquets, same-day delivery on campus.",
-    icon: Flower2,
   },
   {
     id: "9",
@@ -132,7 +109,6 @@ export const services: Service[] = [
     sellerName: "Sam B.",
     sellerInitials: "SB",
     description: "Weekly mowing and trimming for off-campus houses.",
-    icon: Trees,
   },
   {
     id: "10",
@@ -144,6 +120,5 @@ export const services: Service[] = [
     sellerName: "Noah F.",
     sellerInitials: "NF",
     description: "Rides to ROA airport, Kroger, and Target runs on request.",
-    icon: Car,
   },
 ];
