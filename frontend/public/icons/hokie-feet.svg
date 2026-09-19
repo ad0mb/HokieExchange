@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title"><title id="title">Hokie tracks icon</title>
+  <defs>
+    <path id="toe" d="M0,0
+      C-3,-5 -6,-7 -5,-11
+      C-8,-13 -8,-17 -5,-19
+      C-7,-23 -5,-27 -2,-29
+      C-4,-33 -2,-38 0,-42
+      C2,-38 4,-33 2,-29
+      C5,-27 7,-23 5,-19
+      C8,-17 8,-13 5,-11
+      C6,-7 3,-5 0,0 Z"/>
+    <g id="track">
+      <use href="#toe" transform="rotate(-30) translate(0,-9)"/>
+      <use href="#toe" transform="translate(0,-11)"/>
+      <use href="#toe" transform="rotate(30) translate(0,-9)"/>
+      <path d="M-8,-1 C-8,-7 -4,-11 0,-11 C4,-11 8,-7 8,-1 C8,4 4,8 0,8 C-4,8 -8,4 -8,-1 Z"/>
+    </g>
+  </defs>
+  <g fill="#e5751f" stroke="#861f41" stroke-width="3" stroke-linejoin="round">
+    <use href="#track" transform="translate(40,50) scale(1.15) rotate(-6)"/>
+    <use href="#track" transform="translate(90,92) scale(0.95) rotate(4)"/>
+  </g>
+</svg>
