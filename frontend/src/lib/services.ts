@@ -10,6 +10,8 @@ export type Service = {
   sellerInitials: string;
   description: string;
   location: string;
+  rating: number;
+  ratingCount: number;
   imageUrl?: string;
   bookingTimes?: SlotStart[];
 };
@@ -25,6 +27,8 @@ export const services: Service[] = [
     sellerInitials: "MT",
     description: "Homemade fried chicken plates with sides, made to order.",
     location: "Blacksburg",
+    rating: 4.9,
+    ratingCount: 32,
   },
   {
     id: "2",
@@ -36,6 +40,8 @@ export const services: Service[] = [
     sellerInitials: "JP",
     description: "1-on-1 strength training sessions at McComas.",
     location: "Blacksburg",
+    rating: 5.0,
+    ratingCount: 6,
   },
   {
     id: "3",
@@ -47,6 +53,8 @@ export const services: Service[] = [
     sellerInitials: "AR",
     description: "Full glam makeup and gel nails for events.",
     location: "Blacksburg",
+    rating: 4.8,
+    ratingCount: 41,
   },
   {
     id: "4",
@@ -58,6 +66,8 @@ export const services: Service[] = [
     sellerInitials: "DL",
     description: "Clean fades and line-ups, walk-ins welcome near Hethwood.",
     location: "Blacksburg",
+    rating: 4.7,
+    ratingCount: 58,
   },
   {
     id: "5",
@@ -69,6 +79,8 @@ export const services: Service[] = [
     sellerInitials: "PS",
     description: "Full apartment cleaning, move-out ready in under 3 hours.",
     location: "Blacksburg",
+    rating: 4.6,
+    ratingCount: 19,
   },
   {
     id: "6",
@@ -80,6 +92,8 @@ export const services: Service[] = [
     sellerInitials: "EW",
     description: "Barely used bundle, includes lab manual and notes.",
     location: "Blacksburg",
+    rating: 4.5,
+    ratingCount: 4,
   },
   {
     id: "7",
@@ -91,6 +105,8 @@ export const services: Service[] = [
     sellerInitials: "GK",
     description: "1BR sublease available for spring semester, pet friendly.",
     location: "Blacksburg",
+    rating: 4.9,
+    ratingCount: 11,
   },
   {
     id: "8",
@@ -102,6 +118,8 @@ export const services: Service[] = [
     sellerInitials: "LN",
     description: "Fresh seasonal bouquets, same-day delivery on campus.",
     location: "Blacksburg",
+    rating: 5.0,
+    ratingCount: 27,
   },
   {
     id: "9",
@@ -113,6 +131,8 @@ export const services: Service[] = [
     sellerInitials: "SB",
     description: "Weekly mowing and trimming for off-campus houses.",
     location: "Blacksburg",
+    rating: 4.4,
+    ratingCount: 15,
   },
   {
     id: "10",
@@ -124,6 +144,8 @@ export const services: Service[] = [
     sellerInitials: "NF",
     description: "Rides to ROA airport, Kroger, and Target runs on request.",
     location: "Blacksburg",
+    rating: 4.8,
+    ratingCount: 23,
   },
   {
     id: "11",
@@ -135,6 +157,8 @@ export const services: Service[] = [
     sellerInitials: "MC",
     description: "Full move-out cleaning for apartments and houses.",
     location: "Christiansburg",
+    rating: 4.7,
+    ratingCount: 9,
   },
   {
     id: "12",
@@ -146,6 +170,8 @@ export const services: Service[] = [
     sellerInitials: "TH",
     description: "Private guest room minutes from Radford University.",
     location: "Radford",
+    rating: 4.9,
+    ratingCount: 14,
   },
   {
     id: "13",
@@ -157,6 +183,8 @@ export const services: Service[] = [
     sellerInitials: "CB",
     description: "Leaf removal, mulching, and yard cleanup.",
     location: "Roanoke",
+    rating: 4.6,
+    ratingCount: 7,
   },
   {
     id: "14",
@@ -168,6 +196,8 @@ export const services: Service[] = [
     sellerInitials: "NP",
     description: "Healthy meal prep containers delivered weekly.",
     location: "Salem",
+    rating: 4.8,
+    ratingCount: 18,
   },
 ];
 

@@ -1,3 +1,4 @@
+import { Star } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { BookingDialog } from "@/components/marketplace/booking-dialog";
 import { categories } from "@/lib/categories";
@@ -32,6 +33,15 @@ export function ServiceCard({ service }: { service: Service }) {
           </span>
         </p>
         <h3 className="line-clamp-1 text-sm font-semibold">{service.title}</h3>
+        {service.ratingCount > 0 && (
+          <div className="flex items-center gap-1 text-xs">
+            <Star className="h-3.5 w-3.5 fill-foreground text-foreground" />
+            <span className="font-semibold">{service.rating.toFixed(1)}</span>
+            <span className="text-muted-foreground">
+              ({service.ratingCount})
+            </span>
+          </div>
+        )}
         <p className="text-[11px] text-muted-foreground">{service.location}</p>
         <p className="line-clamp-1 text-xs text-muted-foreground">
           {service.description}

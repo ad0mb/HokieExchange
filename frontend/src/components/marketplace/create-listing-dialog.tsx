@@ -102,6 +102,8 @@ export function CreateListingDialog({
       location,
       sellerName: "You",
       sellerInitials: "Y",
+      rating: 0,
+      ratingCount: 0,
       imageUrl: imagePreviews[0],
       bookingTimes: selectedSlots.length > 0 ? selectedSlots : undefined,
     });
