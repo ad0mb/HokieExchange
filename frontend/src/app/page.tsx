@@ -6,23 +6,23 @@ import { services } from "@/lib/services";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col bg-secondary">
+    <div className="flex min-h-screen flex-col">
       <Navbar />
 
-      <div className="mx-auto flex w-full max-w-[1400px] flex-1 gap-6 px-6 py-6">
-        <aside className="w-64 shrink-0">
-          <div className="sticky top-22 rounded-lg border bg-background p-4">
+      <div className="flex flex-1">
+        <aside className="w-80 shrink-0 border-r-4 border-brand-maroon bg-background">
+          <div className="sticky top-16 p-6">
             <Sidebar />
           </div>
         </aside>
 
-        <main className="min-w-0 flex-1">
+        <main className="min-w-0 flex-1 bg-secondary px-6 py-6">
           <div className="mb-4 flex items-center justify-between gap-4">
             <h1 className="text-xl font-bold">Recommended</h1>
             <LocationBadge />
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-4 gap-3">
             {services.map((service) => (
               <ServiceCard key={service.id} service={service} />
             ))}
