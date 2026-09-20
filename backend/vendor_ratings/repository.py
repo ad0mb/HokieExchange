@@ -1,8 +1,12 @@
-from sqlalchemy import select
+import decimal
+
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
+from students.models import Student
 from vendor_ratings.models import VendorRating
 from vendor_ratings.schemas import VendorRatingCreate, VendorRatingUpdate
+from vendors.models import Vendor
 
 
 class VendorRatingRepository:
@@ -22,9 +26,42 @@ class VendorRatingRepository:
     def get_all(self) -> list[VendorRating]:
         return list(self.db.scalars(select(VendorRating)).all())
 
-    def get_for_vendor(self, vendor_id: int) -> list[VendorRating]:
-        statement = select(VendorRating).where(VendorRating.vendor_id == vendor_id)
+    def list_reviews(
+        self,
+        vendor_id: int | None = None,
+        student_id: int | None = None,
+        search: str | None = None,
+        sort: str | None = None,
+    ) -> list[VendorRating]:
+        statement = select(VendorRating)
+        if vendor_id is not None:
+            statement = statement.where(VendorRating.vendor_id == vendor_id)
+        if student_id is not None:
+            statement = statement.where(VendorRating.student_id == student_id)
+        if search:
+            statement = (
+                statement.join(Vendor, VendorRating.vendor_id == Vendor.vendor_id)
+                .join(Student, Vendor.student_id == Student.student_id)
+                .where(
+                    or_(
+                        Student.first_name.ilike(f"%{search}%"),
+                        Student.last_name.ilike(f"%{search}%"),
+                    )
+                )
+            )
+        if sort == "highest":
+            statement = statement.order_by(VendorRating.rating.desc())
+        elif sort == "lowest":
+            statement = statement.order_by(VendorRating.rating.asc())
         return list(self.db.scalars(statement).all())
+
+    def average_for_vendor(self, vendor_id: int) -> tuple[decimal.Decimal | None, int]:
+        count, average = self.db.execute(
+            select(func.count(), func.avg(VendorRating.rating)).where(
+                VendorRating.vendor_id == vendor_id
+            )
+        ).one()
+        return average, count
 
     def update(self, vendor_rating: VendorRating, data: VendorRatingUpdate) -> VendorRating:
         for field, value in data.model_dump(exclude_unset=True).items():
