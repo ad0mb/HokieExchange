@@ -2,27 +2,43 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Star } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Pencil, Star } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { BookingDialog } from "@/components/marketplace/booking-dialog";
+import type { BookingSelection } from "@/components/marketplace/availability-picker";
 import { ImageCarousel } from "@/components/marketplace/image-carousel";
 import { ListingDialog } from "@/components/marketplace/listing-dialog";
 import { categories } from "@/lib/categories";
 import { sellerHref } from "@/lib/sellers";
-import { DEFAULT_SLOT_TIMES, type SlotStart } from "@/lib/availability";
+import { bookSlot } from "@/lib/services-store";
+import { useCurrentViewer } from "@/lib/use-current-viewer";
 import type { Service } from "@/lib/services";
 
 export function ServiceCard({ service }: { service: Service }) {
   const Icon = categories.find((c) => c.slug === service.categorySlug)!.icon;
   const [detailOpen, setDetailOpen] = useState(false);
-  const [bookingTimes, setBookingTimes] = useState(service.bookingTimes);
+  const router = useRouter();
+  const viewer = useCurrentViewer();
+  const isOwnListing = service.sellerName === "You";
 
-  function handleBook([bookedHour, bookedMinute]: SlotStart) {
-    setBookingTimes((prev) =>
-      (prev ?? DEFAULT_SLOT_TIMES).filter(
-        ([hour, minute]) => hour !== bookedHour || minute !== bookedMinute
-      )
-    );
+  function handleBook(selection: BookingSelection) {
+    bookSlot(service.id, selection.slot, {
+      id: crypto.randomUUID(),
+      dateLabel: selection.dateLabel,
+      timeLabel: selection.label,
+      bookerName: viewer.name,
+      bookerInitials: viewer.initials,
+      bookerImage: viewer.image,
+    });
+  }
+
+  function openCard() {
+    if (isOwnListing) {
+      router.push(`/listings/${service.id}`);
+    } else {
+      setDetailOpen(true);
+    }
   }
 
   return (
@@ -30,9 +46,9 @@ export function ServiceCard({ service }: { service: Service }) {
       <div
         role="button"
         tabIndex={0}
-        onClick={() => setDetailOpen(true)}
+        onClick={openCard}
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") setDetailOpen(true);
+          if (e.key === "Enter" || e.key === " ") openCard();
         }}
         className="flex cursor-pointer flex-col overflow-hidden rounded-lg border bg-background transition-shadow hover:shadow-md"
       >
@@ -87,21 +103,33 @@ export function ServiceCard({ service }: { service: Service }) {
                 {service.sellerName}
               </Link>
             </div>
-            <BookingDialog
-              serviceTitle={service.title}
-              bookingTimes={bookingTimes}
-              onBook={handleBook}
-            />
+            {isOwnListing ? (
+              <Link
+                href={`/listings/${service.id}`}
+                className="flex items-center gap-1 text-xs font-semibold text-brand-maroon hover:underline"
+              >
+                <Pencil className="h-3 w-3" />
+                Manage
+              </Link>
+            ) : (
+              <BookingDialog
+                serviceTitle={service.title}
+                bookingTimes={service.bookingTimes}
+                onBook={handleBook}
+              />
+            )}
           </div>
         </div>
       </div>
 
-      <ListingDialog
-        service={{ ...service, bookingTimes }}
-        open={detailOpen}
-        onOpenChange={setDetailOpen}
-        onBook={handleBook}
-      />
+      {!isOwnListing && (
+        <ListingDialog
+          service={service}
+          open={detailOpen}
+          onOpenChange={setDetailOpen}
+          onBook={handleBook}
+        />
+      )}
     </>
   );
 }

@@ -1,5 +1,14 @@
 import type { SlotStart } from "@/lib/availability";
 
+export type Booking = {
+  id: string;
+  dateLabel: string;
+  timeLabel: string;
+  bookerName: string;
+  bookerInitials: string;
+  bookerImage?: string;
+};
+
 export type Service = {
   id: string;
   title: string;
@@ -14,6 +23,7 @@ export type Service = {
   ratingCount: number;
   imageUrls?: string[];
   bookingTimes?: SlotStart[];
+  bookings?: Booking[];
 };
 
 export const services: Service[] = [
