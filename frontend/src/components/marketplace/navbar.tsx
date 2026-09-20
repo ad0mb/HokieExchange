@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/marketplace/logo";
 import { LoginDialog } from "@/components/marketplace/login-dialog";
 import { MessagesButton } from "@/components/marketplace/messages-button";
+import { ThemeToggle } from "@/components/marketplace/theme-toggle";
 
 export function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { status } = useSession();
@@ -29,6 +30,7 @@ export function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <ThemeToggle />
           {status === "authenticated" ? (
             <MessagesButton />
           ) : (
