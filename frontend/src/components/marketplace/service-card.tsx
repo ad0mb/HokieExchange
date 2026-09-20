@@ -17,12 +17,20 @@ export function ServiceCard({ service }: { service: Service }) {
     <div className="group flex flex-col overflow-hidden rounded-lg border bg-background transition-shadow hover:shadow-md">
       <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-secondary">
         {images.length > 0 ? (
-          // eslint-disable-next-line @next/next/no-img-element -- client-only object URL preview, not a static/remote asset
-          <img
-            src={images[imageIndex]}
-            alt={`${service.title} photo ${imageIndex + 1}`}
-            className="h-full w-full object-cover transition-transform group-hover:scale-110"
-          />
+          <div
+            className="flex h-full w-full transition-transform duration-300 ease-in-out"
+            style={{ transform: `translateX(-${imageIndex * 100}%)` }}
+          >
+            {images.map((src, i) => (
+              // eslint-disable-next-line @next/next/no-img-element -- client-only object URL preview, not a static/remote asset
+              <img
+                key={i}
+                src={src}
+                alt={`${service.title} photo ${i + 1}`}
+                className="h-full w-full shrink-0 object-cover transition-transform group-hover:scale-110"
+              />
+            ))}
+          </div>
         ) : (
           <Icon
             className="h-10 w-10 text-brand-maroon/70 transition-transform group-hover:scale-110"
