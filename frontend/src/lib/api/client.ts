@@ -1,10 +1,11 @@
 import { ApiError } from "@/lib/api/types";
 
 /**
- * Base URL of the FastAPI backend. Override with NEXT_PUBLIC_API_URL
- * (e.g. a deployed backend); defaults to localhost for development.
+ * Base path for the FastAPI backend. Requests are proxied through the
+ * Next.js server (`/api/backend/*` → `${BACKEND_URL}/*` via next.config.ts
+ * rewrites), so the browser only talks same-origin HTTPS to Vercel.
  */
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const BASE_URL = "/api/backend";
 
 /**
  * The single entry point for every backend call in the API layer.
