@@ -3,18 +3,28 @@ from sqlalchemy.orm import Session
 
 import model_registry  # noqa: F401  # Registers every feature model with SQLAlchemy.
 from consumer_ratings.repository import ConsumerRatingRepository
+from consumer_ratings.router import router as consumer_ratings_router
 from consumer_ratings.schemas import ConsumerRatingRead
 from services.repository import ServiceRepository, TimeBlockConfigRepository, TimeBlockRepository
+from services.router import router as services_router
 from services.schemas import ServiceRead, TimeBlockConfigRead, TimeBlockRead
 from students.repository import StudentRepository
+from students.router import router as students_router
 from students.schemas import StudentRead
 from vendors.repository import VendorRepository
+from vendors.router import router as vendors_router
 from vendors.schemas import VendorRead
 from vendor_ratings.repository import VendorRatingRepository
+from vendor_ratings.router import router as vendor_ratings_router
 from vendor_ratings.schemas import VendorRatingRead
 from database import get_db
 
 app = FastAPI()
+app.include_router(students_router)
+app.include_router(vendors_router)
+app.include_router(services_router)
+app.include_router(vendor_ratings_router)
+app.include_router(consumer_ratings_router)
 
 
 @app.get("/")
