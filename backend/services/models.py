@@ -26,6 +26,7 @@ class Service(Base):
     service_name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(String(1000), nullable=False)
     location: Mapped[Optional[str]] = mapped_column(String(255))
+    category: Mapped[str] = mapped_column(String(50), nullable=False)
     price: Mapped[decimal.Decimal] = mapped_column(DECIMAL(10, 2), nullable=False)
     duration: Mapped[datetime.time] = mapped_column(Time, nullable=False)
     date_created: Mapped[Optional[datetime.datetime]] = mapped_column(

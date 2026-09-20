@@ -44,12 +44,14 @@ def list_services(
     repo: ServiceRepo,
     vendor_id: int | None = None,
     search: str | None = None,
+    category: str | None = None,
     min_price: decimal.Decimal | None = None,
     max_price: decimal.Decimal | None = None,
 ) -> list[ServiceWithRating]:
     rows = repo.list_with_rating(
         vendor_id=vendor_id,
         search=search,
+        category=category,
         min_price=min_price,
         max_price=max_price,
     )
@@ -60,6 +62,7 @@ def list_services(
             service_name=service.service_name,
             description=service.description,
             location=service.location,
+            category=service.category,
             price=service.price,
             duration=service.duration,
             rating=avg_rating,

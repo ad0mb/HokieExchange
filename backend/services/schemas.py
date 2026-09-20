@@ -10,6 +10,7 @@ class ServiceCreate(BaseModel):
     service_name: str
     description: str
     location: Optional[str] = None
+    category: str
     price: decimal.Decimal
     duration: datetime.time
 
@@ -18,6 +19,7 @@ class ServiceUpdate(BaseModel):
     service_name: Optional[str] = None
     description: Optional[str] = None
     location: Optional[str] = None
+    category: Optional[str] = None
     price: Optional[decimal.Decimal] = None
     duration: Optional[datetime.time] = None
 
@@ -28,6 +30,7 @@ class ServiceRead(BaseModel):
     service_name: str
     description: str
     location: Optional[str]
+    category: str
     price: decimal.Decimal
     duration: datetime.time
     date_created: Optional[datetime.datetime]
@@ -42,6 +45,7 @@ class ServiceWithRating(BaseModel):
     service_name: str
     description: str
     location: Optional[str]
+    category: str
     price: decimal.Decimal
     duration: datetime.time
     rating: Optional[decimal.Decimal]

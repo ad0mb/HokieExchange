@@ -29,6 +29,7 @@ class ServiceRepository:
         self,
         vendor_id: int | None = None,
         search: str | None = None,
+        category: str | None = None,
         min_price: decimal.Decimal | None = None,
         max_price: decimal.Decimal | None = None,
     ) -> list[tuple[Service, decimal.Decimal | None, int]]:
@@ -53,6 +54,8 @@ class ServiceRepository:
             statement = statement.where(Service.vendor_id == vendor_id)
         if search:
             statement = statement.where(Service.service_name.ilike(f"%{search}%"))
+        if category:
+            statement = statement.where(Service.category == category)
         if min_price is not None:
             statement = statement.where(Service.price >= min_price)
         if max_price is not None:
