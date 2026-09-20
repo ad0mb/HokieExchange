@@ -10,16 +10,22 @@ export default function AccountPage() {
   const googleUser = session?.user;
 
   const profile = googleUser
-    ? {
-        ...currentUser,
-        firstName: googleUser.firstName ?? currentUser.firstName,
-        lastName: googleUser.lastName ?? currentUser.lastName,
-        email: googleUser.email ?? currentUser.email,
-        avatarInitials:
-          `${googleUser.firstName?.[0] ?? ""}${googleUser.lastName?.[0] ?? ""}`.toUpperCase() ||
-          currentUser.avatarInitials,
-        image: googleUser.image ?? undefined,
-      }
+    ? (() => {
+        const [nameFirst, ...nameRest] = (googleUser.name ?? "").split(" ");
+        const firstName = googleUser.firstName || nameFirst || "";
+        const lastName = googleUser.lastName || nameRest.join(" ");
+
+        return {
+          ...currentUser,
+          firstName,
+          lastName,
+          email: googleUser.email ?? currentUser.email,
+          avatarInitials:
+            `${firstName[0] ?? ""}${lastName[0] ?? ""}`.toUpperCase() ||
+            currentUser.avatarInitials,
+          image: googleUser.image ?? undefined,
+        };
+      })()
     : currentUser;
 
   return (
