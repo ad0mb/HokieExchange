@@ -8,6 +8,7 @@ from identity.models import GoogleIdentity
 from identity.router import current_student
 from students.models import Student
 from vendors.models import Vendor
+from assistant import BOT_CONTACT, BOT_STUDENT_ID
 from .transport import require_repository, room, sio
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
@@ -34,6 +35,9 @@ async def inbox(user=Depends(current_student), db: Session = Depends(get_db)):
     for row in rows:
         doc = row["last"]
         peer_id = doc["recipient_id"] if doc["sender_id"] == user.student_id else doc["sender_id"]
+        if peer_id == BOT_STUDENT_ID:
+            result.append({"contact": BOT_CONTACT, "lastMessage": require_repository().serialize(doc), "unread": row["unread"]})
+            continue
         peer = db.get(Student, peer_id)
         if peer:
             result.append({"contact": contact(db, peer), "lastMessage": require_repository().serialize(doc), "unread": row["unread"]})
