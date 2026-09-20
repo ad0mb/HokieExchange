@@ -9,24 +9,23 @@ import { MessagesButton } from "@/components/marketplace/messages-button";
 import { ReviewCard } from "@/components/account/review-card";
 import { cn } from "@/lib/utils";
 import { currentUser, type AccountProfile } from "@/lib/account";
-import { services } from "@/lib/services";
+import type { Service } from "@/lib/services";
 
 type View = "vendor" | "buyer";
 
 export function ProfileView({
   profile = currentUser,
+  listings = [],
   showMessageButton = false,
   messageHref = "/chats",
 }: {
   profile?: AccountProfile;
+  listings?: Service[];
   showMessageButton?: boolean;
   messageHref?: string;
 }) {
   const [view, setView] = useState<View>("vendor");
   const roleProfile = profile[view];
-  const listings = services.filter((s) =>
-    profile.vendor.listingIds.includes(s.id)
-  );
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-8">

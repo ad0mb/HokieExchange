@@ -1,4 +1,4 @@
-import { services, type Service } from "@/lib/services";
+import type { Service } from "@/lib/services";
 import type { AccountProfile } from "@/lib/account";
 
 export function sellerSlug(name: string): string {
@@ -14,8 +14,13 @@ export function sellerHref(service: Service): string {
     : `/seller/${sellerSlug(service.sellerName)}`;
 }
 
-export function getSellerProfile(slug: string): AccountProfile | null {
-  const listings = services.filter((s) => sellerSlug(s.sellerName) === slug);
+export function getSellerProfile(
+  services: Service[],
+  slug: string
+): AccountProfile | null {
+  const listings = services.filter(
+    (s) => s.sellerName !== "You" && sellerSlug(s.sellerName) === slug
+  );
   if (listings.length === 0) return null;
 
   const [sample] = listings;

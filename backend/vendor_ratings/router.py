@@ -5,7 +5,12 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from vendor_ratings.repository import VendorRatingRepository
-from vendor_ratings.schemas import VendorRatingCreate, VendorRatingRead, VendorRatingUpdate
+from vendor_ratings.schemas import (
+    VendorRatingAverage,
+    VendorRatingCreate,
+    VendorRatingRead,
+    VendorRatingUpdate,
+)
 
 router = APIRouter(prefix="/vendor-ratings", tags=["Vendor Ratings"])
 
@@ -17,10 +22,27 @@ def get_vendor_rating_repository(db: Session = Depends(get_db)) -> VendorRatingR
 Repo = Annotated[VendorRatingRepository, Depends(get_vendor_rating_repository)]
 
 
-@router.get("/", response_model=list[VendorRatingRead])
-def list_vendor_ratings(repo: Repo, vendor_id: int | None = None) -> list[VendorRatingRead]:
-    ratings = repo.get_for_vendor(vendor_id) if vendor_id is not None else repo.get_all()
+@router.get("", response_model=list[VendorRatingRead])
+def list_vendor_ratings(
+    repo: Repo,
+    vendor_id: int | None = None,
+    student_id: int | None = None,
+    search: str | None = None,
+    sort: str | None = None,
+) -> list[VendorRatingRead]:
+    ratings = repo.list_reviews(
+        vendor_id=vendor_id,
+        student_id=student_id,
+        search=search,
+        sort=sort,
+    )
     return [VendorRatingRead.model_validate(rating) for rating in ratings]
+
+
+@router.get("/average", response_model=VendorRatingAverage)
+def get_vendor_rating_average(vendor_id: int, repo: Repo) -> VendorRatingAverage:
+    average, count = repo.average_for_vendor(vendor_id)
+    return VendorRatingAverage(vendor_id=vendor_id, average=average, count=count)
 
 
 @router.get("/{rating_id}", response_model=VendorRatingRead)
@@ -31,7 +53,7 @@ def get_vendor_rating(rating_id: int, repo: Repo) -> VendorRatingRead:
     return VendorRatingRead.model_validate(rating)
 
 
-@router.post("/", response_model=VendorRatingRead, status_code=201)
+@router.post("", response_model=VendorRatingRead, status_code=201)
 def create_vendor_rating(data: VendorRatingCreate, repo: Repo) -> VendorRatingRead:
     return VendorRatingRead.model_validate(repo.create(data))
 

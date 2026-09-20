@@ -3,9 +3,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from database import get_db
 from consumer_ratings.repository import ConsumerRatingRepository
-from consumer_ratings.schemas import ConsumerRatingCreate, ConsumerRatingRead, ConsumerRatingUpdate
+from consumer_ratings.schemas import (
+    ConsumerRatingAverage,
+    ConsumerRatingCreate,
+    ConsumerRatingRead,
+    ConsumerRatingUpdate,
+)
+from database import get_db
 
 router = APIRouter(prefix="/consumer-ratings", tags=["Consumer Ratings"])
 
@@ -17,10 +22,27 @@ def get_consumer_rating_repository(db: Session = Depends(get_db)) -> ConsumerRat
 Repo = Annotated[ConsumerRatingRepository, Depends(get_consumer_rating_repository)]
 
 
-@router.get("/", response_model=list[ConsumerRatingRead])
-def list_consumer_ratings(repo: Repo, vendor_id: int | None = None) -> list[ConsumerRatingRead]:
-    ratings = repo.get_for_vendor(vendor_id) if vendor_id is not None else repo.get_all()
+@router.get("", response_model=list[ConsumerRatingRead])
+def list_consumer_ratings(
+    repo: Repo,
+    student_id: int | None = None,
+    vendor_id: int | None = None,
+    search: str | None = None,
+    sort: str | None = None,
+) -> list[ConsumerRatingRead]:
+    ratings = repo.list_reviews(
+        student_id=student_id,
+        vendor_id=vendor_id,
+        search=search,
+        sort=sort,
+    )
     return [ConsumerRatingRead.model_validate(rating) for rating in ratings]
+
+
+@router.get("/average", response_model=ConsumerRatingAverage)
+def get_consumer_rating_average(student_id: int, repo: Repo) -> ConsumerRatingAverage:
+    average, count = repo.average_for_student(student_id)
+    return ConsumerRatingAverage(student_id=student_id, average=average, count=count)
 
 
 @router.get("/{rating_id}", response_model=ConsumerRatingRead)
@@ -31,7 +53,7 @@ def get_consumer_rating(rating_id: int, repo: Repo) -> ConsumerRatingRead:
     return ConsumerRatingRead.model_validate(rating)
 
 
-@router.post("/", response_model=ConsumerRatingRead, status_code=201)
+@router.post("", response_model=ConsumerRatingRead, status_code=201)
 def create_consumer_rating(data: ConsumerRatingCreate, repo: Repo) -> ConsumerRatingRead:
     return ConsumerRatingRead.model_validate(repo.create(data))
 

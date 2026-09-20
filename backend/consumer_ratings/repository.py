@@ -1,8 +1,11 @@
-from sqlalchemy import select
+import decimal
+
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from consumer_ratings.models import ConsumerRating
 from consumer_ratings.schemas import ConsumerRatingCreate, ConsumerRatingUpdate
+from students.models import Student
 
 
 class ConsumerRatingRepository:
@@ -22,9 +25,40 @@ class ConsumerRatingRepository:
     def get_all(self) -> list[ConsumerRating]:
         return list(self.db.scalars(select(ConsumerRating)).all())
 
-    def get_for_vendor(self, vendor_id: int) -> list[ConsumerRating]:
-        statement = select(ConsumerRating).where(ConsumerRating.vendor_id == vendor_id)
+    def list_reviews(
+        self,
+        student_id: int | None = None,
+        vendor_id: int | None = None,
+        search: str | None = None,
+        sort: str | None = None,
+    ) -> list[ConsumerRating]:
+        statement = select(ConsumerRating)
+        if student_id is not None:
+            statement = statement.where(ConsumerRating.student_id == student_id)
+        if vendor_id is not None:
+            statement = statement.where(ConsumerRating.vendor_id == vendor_id)
+        if search:
+            statement = statement.join(
+                Student, ConsumerRating.student_id == Student.student_id
+            ).where(
+                or_(
+                    Student.first_name.ilike(f"%{search}%"),
+                    Student.last_name.ilike(f"%{search}%"),
+                )
+            )
+        if sort == "highest":
+            statement = statement.order_by(ConsumerRating.rating.desc())
+        elif sort == "lowest":
+            statement = statement.order_by(ConsumerRating.rating.asc())
         return list(self.db.scalars(statement).all())
+
+    def average_for_student(self, student_id: int) -> tuple[decimal.Decimal | None, int]:
+        count, average = self.db.execute(
+            select(func.count(), func.avg(ConsumerRating.rating)).where(
+                ConsumerRating.student_id == student_id
+            )
+        ).one()
+        return average, count
 
     def update(self, consumer_rating: ConsumerRating, data: ConsumerRatingUpdate) -> ConsumerRating:
         for field, value in data.model_dump(exclude_unset=True).items():

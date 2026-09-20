@@ -33,3 +33,6 @@ class Student(Base):
     vendor_ratings: Mapped[list["VendorRating"]] = relationship(
         "VendorRating", back_populates="student", passive_deletes=True
     )
+    appointments: Mapped[list["Appointment"]] = relationship(
+        "Appointment", back_populates="student", passive_deletes=True
+    )
