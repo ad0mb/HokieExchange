@@ -3,6 +3,13 @@
 import { getUpcomingAvailability, type SlotStart } from "@/lib/availability";
 import { cn } from "@/lib/utils";
 
+export type BookingSelection = {
+  key: string;
+  dateLabel: string;
+  slot: SlotStart;
+  label: string;
+};
+
 export function AvailabilityPicker({
   bookingTimes,
   selected,
@@ -11,7 +18,7 @@ export function AvailabilityPicker({
 }: {
   bookingTimes?: SlotStart[];
   selected?: string | null;
-  onSelect?: (slot: string) => void;
+  onSelect?: (selection: BookingSelection) => void;
   className?: string;
 }) {
   const availability = getUpcomingAvailability(7, bookingTimes);
@@ -22,14 +29,16 @@ export function AvailabilityPicker({
         <div key={day.dateLabel}>
           <h3 className="mb-1.5 text-sm font-semibold">{day.dateLabel}</h3>
           <div className="flex flex-wrap gap-1.5">
-            {day.times.map((time) => {
-              const slot = `${day.dateLabel} · ${time}`;
-              const active = selected === slot;
+            {day.times.map(({ slot, label }) => {
+              const key = `${day.dateLabel} · ${label}`;
+              const active = selected === key;
               return (
                 <button
-                  key={time}
+                  key={label}
                   type="button"
-                  onClick={() => onSelect?.(slot)}
+                  onClick={() =>
+                    onSelect?.({ key, dateLabel: day.dateLabel, slot, label })
+                  }
                   className={cn(
                     "rounded-full border px-2.5 py-1 text-xs transition-colors",
                     active
@@ -37,7 +46,7 @@ export function AvailabilityPicker({
                       : "hover:border-brand-maroon hover:text-brand-maroon"
                   )}
                 >
-                  {time}
+                  {label}
                 </button>
               );
             })}

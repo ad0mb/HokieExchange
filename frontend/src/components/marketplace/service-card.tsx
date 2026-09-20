@@ -9,11 +9,21 @@ import { ImageCarousel } from "@/components/marketplace/image-carousel";
 import { ListingDialog } from "@/components/marketplace/listing-dialog";
 import { categories } from "@/lib/categories";
 import { sellerHref } from "@/lib/sellers";
+import { DEFAULT_SLOT_TIMES, type SlotStart } from "@/lib/availability";
 import type { Service } from "@/lib/services";
 
 export function ServiceCard({ service }: { service: Service }) {
   const Icon = categories.find((c) => c.slug === service.categorySlug)!.icon;
   const [detailOpen, setDetailOpen] = useState(false);
+  const [bookingTimes, setBookingTimes] = useState(service.bookingTimes);
+
+  function handleBook([bookedHour, bookedMinute]: SlotStart) {
+    setBookingTimes((prev) =>
+      (prev ?? DEFAULT_SLOT_TIMES).filter(
+        ([hour, minute]) => hour !== bookedHour || minute !== bookedMinute
+      )
+    );
+  }
 
   return (
     <>
@@ -79,16 +89,18 @@ export function ServiceCard({ service }: { service: Service }) {
             </div>
             <BookingDialog
               serviceTitle={service.title}
-              bookingTimes={service.bookingTimes}
+              bookingTimes={bookingTimes}
+              onBook={handleBook}
             />
           </div>
         </div>
       </div>
 
       <ListingDialog
-        service={service}
+        service={{ ...service, bookingTimes }}
         open={detailOpen}
         onOpenChange={setDetailOpen}
+        onBook={handleBook}
       />
     </>
   );
