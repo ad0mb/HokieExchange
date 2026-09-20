@@ -56,7 +56,7 @@ class TimeBlockConfig(Base):
     config_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     service_id: Mapped[int] = mapped_column(Integer, nullable=False)
     duration: Mapped[datetime.time] = mapped_column(Time, nullable=False)
-    price: Mapped[decimal.Decimal] = mapped_column(DECIMAL(10, 0), nullable=False)
+    price: Mapped[decimal.Decimal] = mapped_column(DECIMAL(10, 2), nullable=False)
     date_created: Mapped[Optional[datetime.datetime]] = mapped_column(
         DateTime, server_default=text("CURRENT_TIMESTAMP")
     )
