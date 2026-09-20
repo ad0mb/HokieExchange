@@ -2,14 +2,19 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from vendors.models import Vendor
-from vendors.schemas import VendorUpdate
+from vendors.schemas import VendorCreate, VendorUpdate
 
-from fastapi import Depends
-from database import get_db
 
 class VendorRepository:
     def __init__(self, db: Session) -> None:
         self.db = db
+
+    def create(self, data: VendorCreate) -> Vendor:
+        vendor = Vendor(**data.model_dump())
+        self.db.add(vendor)
+        self.db.commit()
+        self.db.refresh(vendor)
+        return vendor
 
     def get_by_id(self, vendor_id: int) -> Vendor | None:
         return self.db.get(Vendor, vendor_id)
@@ -28,6 +33,3 @@ class VendorRepository:
     def delete(self, vendor: Vendor) -> None:
         self.db.delete(vendor)
         self.db.commit()
-
-async def get_vendor_repo(db: Session = Depends(get_db)) -> VendorRepository:
-    return VendorRepository(db)

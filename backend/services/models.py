@@ -26,7 +26,7 @@ class Service(Base):
     service_name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(String(1000), nullable=False)
     location: Mapped[Optional[str]] = mapped_column(String(255))
-    schedule_type: Mapped[Optional[str]] = mapped_column(String(10), comment='"on-demand" or "per-block"')
+    schedule_type: Mapped[str] = mapped_column(String(10), nullable=False, comment='"on-demand" or "per-block"')
     date_created: Mapped[Optional[datetime.datetime]] = mapped_column(
         TIMESTAMP, server_default=text("CURRENT_TIMESTAMP")
     )

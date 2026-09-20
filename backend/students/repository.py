@@ -2,12 +2,19 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from students.models import Student
-from students.schemas import StudentUpdate
+from students.schemas import StudentCreate, StudentUpdate
 
 
 class StudentRepository:
     def __init__(self, db: Session) -> None:
         self.db = db
+
+    def create(self, data: StudentCreate) -> Student:
+        student = Student(**data.model_dump())
+        self.db.add(student)
+        self.db.commit()
+        self.db.refresh(student)
+        return student
 
     def get_by_id(self, student_id: int) -> Student | None:
         return self.db.get(Student, student_id)
