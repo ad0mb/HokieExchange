@@ -30,9 +30,13 @@ app.include_router(vendor_ratings_router)
 
 
 @app.get("/", tags=["Health"])
-def health() -> dict[str, str]:
+def get() -> dict[str, str]:
     return {"status": "ok"}
 
+
+@app.get("/health", tags=["Health"])
+def health() -> dict[str, str]:
+    return {"status": "ok"}
 
 app = socketio.ASGIApp(sio, other_asgi_app=app)
 
