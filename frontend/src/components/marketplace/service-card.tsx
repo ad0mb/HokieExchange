@@ -1,4 +1,7 @@
-import { Star } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { BookingDialog } from "@/components/marketplace/booking-dialog";
 import { categories } from "@/lib/categories";
@@ -6,15 +9,17 @@ import type { Service } from "@/lib/services";
 
 export function ServiceCard({ service }: { service: Service }) {
   const Icon = categories.find((c) => c.slug === service.categorySlug)!.icon;
+  const images = service.imageUrls ?? [];
+  const [imageIndex, setImageIndex] = useState(0);
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-lg border bg-background transition-shadow hover:shadow-md">
-      <div className="flex aspect-square items-center justify-center overflow-hidden bg-secondary">
-        {service.imageUrl ? (
+      <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-secondary">
+        {images.length > 0 ? (
           // eslint-disable-next-line @next/next/no-img-element -- client-only object URL preview, not a static/remote asset
           <img
-            src={service.imageUrl}
-            alt={service.title}
+            src={images[imageIndex]}
+            alt={`${service.title} photo ${imageIndex + 1}`}
             className="h-full w-full object-cover transition-transform group-hover:scale-110"
           />
         ) : (
@@ -22,6 +27,29 @@ export function ServiceCard({ service }: { service: Service }) {
             className="h-10 w-10 text-brand-maroon/70 transition-transform group-hover:scale-110"
             strokeWidth={1.5}
           />
+        )}
+
+        {images.length > 1 && (
+          <>
+            <button
+              type="button"
+              aria-label="Previous photo"
+              onClick={() =>
+                setImageIndex((i) => (i - 1 + images.length) % images.length)
+              }
+              className="absolute left-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-foreground opacity-0 shadow transition-opacity group-hover:opacity-100"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              aria-label="Next photo"
+              onClick={() => setImageIndex((i) => (i + 1) % images.length)}
+              className="absolute right-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-foreground opacity-0 shadow transition-opacity group-hover:opacity-100"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </>
         )}
       </div>
 
