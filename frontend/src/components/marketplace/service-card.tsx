@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Star } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { BookingDialog } from "@/components/marketplace/booking-dialog";
 import { ImageCarousel } from "@/components/marketplace/image-carousel";
 import { ListingDialog } from "@/components/marketplace/listing-dialog";
 import { categories } from "@/lib/categories";
+import { sellerHref } from "@/lib/sellers";
 import type { Service } from "@/lib/services";
 
 export function ServiceCard({ service }: { service: Service }) {
@@ -68,9 +70,12 @@ export function ServiceCard({ service }: { service: Service }) {
                   {service.sellerInitials}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-xs text-muted-foreground">
+              <Link
+                href={sellerHref(service)}
+                className="text-xs text-muted-foreground hover:text-brand-maroon hover:underline"
+              >
                 {service.sellerName}
-              </span>
+              </Link>
             </div>
             <BookingDialog
               serviceTitle={service.title}

@@ -2,22 +2,31 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Star } from "lucide-react";
+import { ArrowLeft, MessageCircle, Star } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ServiceCard } from "@/components/marketplace/service-card";
 import { ReviewCard } from "@/components/account/review-card";
 import { cn } from "@/lib/utils";
-import { currentUser } from "@/lib/account";
+import { currentUser, type AccountProfile } from "@/lib/account";
 import { services } from "@/lib/services";
 
 type View = "vendor" | "buyer";
 
-export function AccountView() {
+export function ProfileView({
+  profile = currentUser,
+  showMessageButton = false,
+  messageHref = "/chats",
+}: {
+  profile?: AccountProfile;
+  showMessageButton?: boolean;
+  messageHref?: string;
+}) {
   const [view, setView] = useState<View>("vendor");
-  const profile = currentUser[view];
+  const roleProfile = profile[view];
   const listings = services.filter((s) =>
-    currentUser.vendor.listingIds.includes(s.id)
+    profile.vendor.listingIds.includes(s.id)
   );
 
   return (
@@ -30,31 +39,40 @@ export function AccountView() {
         Back to Marketplace
       </Link>
 
-      <div className="flex flex-wrap items-start justify-between gap-8">
+      <div className="flex flex-wrap items-center justify-between gap-8">
         <div className="flex flex-wrap items-center gap-5">
           <Avatar className="h-28 w-28">
             <AvatarFallback className="bg-brand-maroon text-3xl text-white">
-              {currentUser.avatarInitials}
+              {profile.avatarInitials}
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col gap-3">
             <div className="flex gap-3">
               <Input
-                value={currentUser.firstName}
+                value={profile.firstName}
                 readOnly
                 className="h-12 w-32 text-base sm:w-40"
               />
               <Input
-                value={currentUser.lastName}
+                value={profile.lastName}
                 readOnly
                 className="h-12 w-32 text-base sm:w-40"
               />
             </div>
-            <p className="text-sm text-muted-foreground">
-              {currentUser.email}
-            </p>
+            <p className="text-sm text-muted-foreground">{profile.email}</p>
           </div>
         </div>
+
+        {showMessageButton && (
+          <Button
+            size="lg"
+            render={<Link href={messageHref} />}
+            className="font-heading gap-1.5 bg-brand-maroon px-4 text-sm text-white hover:bg-brand-maroon-dark sm:px-6 sm:text-base"
+          >
+            <MessageCircle className="h-4 w-4" />
+            Message
+          </Button>
+        )}
 
         <div className="flex flex-col items-end gap-2">
           <div className="relative inline-flex rounded-full border border-brand-maroon p-1.5">
@@ -86,7 +104,8 @@ export function AccountView() {
             </button>
           </div>
           <p className="max-w-[14rem] text-right text-sm text-muted-foreground">
-            Switches between your vendor and buyer info
+            Switches between {showMessageButton ? "their" : "your"} vendor and
+            buyer info
           </p>
         </div>
       </div>
@@ -94,10 +113,10 @@ export function AccountView() {
       <div className="mt-8 grid gap-8 sm:grid-cols-[1fr_auto]">
         <div>
           <h2 className="mb-3 font-heading text-lg font-bold text-brand-orange">
-            About me
+            About
           </h2>
           <div className="min-h-48 rounded-lg border bg-background p-4 text-base text-muted-foreground">
-            {currentUser.bio}
+            {profile.bio}
           </div>
         </div>
 
@@ -107,8 +126,8 @@ export function AccountView() {
           </h2>
           <p className="text-5xl font-bold">
             {view === "vendor"
-              ? currentUser.vendor.itemsSold
-              : currentUser.buyer.itemsBought}
+              ? profile.vendor.itemsSold
+              : profile.buyer.itemsBought}
           </p>
         </div>
       </div>
@@ -120,14 +139,16 @@ export function AccountView() {
           </h2>
           <div className="flex items-center gap-1.5 text-base">
             <Star className="h-5 w-5 fill-foreground text-foreground" />
-            <span className="font-semibold">{profile.rating.toFixed(1)}</span>
+            <span className="font-semibold">
+              {roleProfile.rating.toFixed(1)}
+            </span>
             <span className="text-muted-foreground">
-              ({profile.ratingCount})
+              ({roleProfile.ratingCount})
             </span>
           </div>
         </div>
         <div className="flex flex-wrap gap-4">
-          {profile.reviews.map((review, i) => (
+          {roleProfile.reviews.map((review, i) => (
             <ReviewCard key={i} review={review} />
           ))}
         </div>

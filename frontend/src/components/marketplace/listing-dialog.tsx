@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Star } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -9,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ImageCarousel } from "@/components/marketplace/image-carousel";
 import { categories } from "@/lib/categories";
+import { sellerHref } from "@/lib/sellers";
 import type { Service } from "@/lib/services";
 
 export function ListingDialog({
@@ -93,7 +95,12 @@ export function ListingDialog({
                   {service.sellerInitials}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm font-medium">{service.sellerName}</span>
+              <Link
+                href={sellerHref(service)}
+                className="text-sm font-medium hover:text-brand-maroon hover:underline"
+              >
+                {service.sellerName}
+              </Link>
             </div>
           </div>
 
