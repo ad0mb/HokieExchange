@@ -14,12 +14,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, configure_mappers
 
 import model_registry  # noqa: F401
+from appointments.repository import AppointmentRepository
+from appointments.schemas import AppointmentUpdate
 from consumer_ratings.repository import ConsumerRatingRepository
 from consumer_ratings.schemas import ConsumerRatingUpdate
 from items.repository import ItemRepository
 from items.schemas import ItemUpdate
-from services.repository import ServiceRepository, TimeBlockConfigRepository, TimeBlockRepository
-from services.schemas import ServiceUpdate, TimeBlockConfigUpdate, TimeBlockUpdate
+from services.repository import ServiceRepository, TimeBlockRepository
+from services.schemas import ServiceUpdate, TimeBlockUpdate
 from students.repository import StudentRepository
 from students.schemas import StudentUpdate
 from vendor_ratings.repository import VendorRatingRepository
@@ -67,16 +69,16 @@ def main() -> int:
             items = ItemRepository(db).get_all()
             consumer_ratings = ConsumerRatingRepository(db).get_all()
             vendor_ratings = VendorRatingRepository(db).get_all()
-            configs = TimeBlockConfigRepository(db).get_for_service(services[0].service_id) if services else []
             time_blocks = TimeBlockRepository(db).get_all()
+            appointments = AppointmentRepository(db).get_all()
 
         checks = [
             ("Student", StudentRepository, students, lambda x: StudentUpdate(graduation_year=x.graduation_year + 1)),
             ("Vendor", VendorRepository, vendors, lambda x: VendorUpdate(description=x.description[:970] + " [test]")),
-            ("Service", ServiceRepository, services, lambda x: ServiceUpdate(location=(x.location or "")[:240] + " [test]")),
+            ("Service", ServiceRepository, services, lambda x: ServiceUpdate(price=decimal.Decimal(x.price) + 1)),
             ("Item", ItemRepository, items, lambda x: ItemUpdate(stock=x.stock + 1)),
-            ("TimeBlockConfig", TimeBlockConfigRepository, configs, lambda x: TimeBlockConfigUpdate(price=decimal.Decimal(x.price) + 1)),
-            ("TimeBlock", TimeBlockRepository, time_blocks, lambda x: TimeBlockUpdate(start_time=x.start_time + datetime.timedelta(minutes=1))),
+            ("TimeBlock", TimeBlockRepository, time_blocks, lambda x: TimeBlockUpdate(day_of_week=(x.day_of_week + 1) % 7)),
+            ("Appointment", AppointmentRepository, appointments, lambda x: AppointmentUpdate(status="no-show")),
             ("ConsumerRating", ConsumerRatingRepository, consumer_ratings, lambda x: ConsumerRatingUpdate(rating=decimal.Decimal(x.rating) + 1)),
             ("VendorRating", VendorRatingRepository, vendor_ratings, lambda x: VendorRatingUpdate(description=(x.description or "")[:990] + " [test]")),
         ]
