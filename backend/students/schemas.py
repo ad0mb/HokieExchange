@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict
 class StudentCreate(BaseModel):
     first_name: str
     last_name: str
-    graduation_year: int
+    graduation_year: Optional[int] = None
     sso_id: Optional[int] = None
 
 
@@ -22,8 +22,9 @@ class StudentRead(BaseModel):
     student_id: int
     first_name: str
     last_name: str
-    graduation_year: int
+    graduation_year: Optional[int]
     sso_id: Optional[int]
+    email: Optional[str]
     date_created: Optional[datetime.datetime]
     date_updated: Optional[datetime.datetime]
 

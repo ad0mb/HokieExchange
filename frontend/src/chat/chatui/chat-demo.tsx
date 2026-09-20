@@ -1,20 +1,49 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
+import { useChat } from "@/chat/chat-provider";
+import type { Contact } from "@/chat/chatsignal/client";
+import { Navbar } from "@/components/marketplace/navbar";
 import { ChatWindow } from "./chat-window";
+
 export function ChatDemo() {
-  const [pair, setPair] = useState<{studentId:number; vendorId:number; role:"student" | "vendor"} | null>(null);
-  return <main className="min-h-screen bg-stone-50 px-4 py-10 text-stone-900">
-    <div className="mx-auto max-w-3xl"><Link href="/" className="text-sm text-[#630031]">← Hokie Exchange</Link>
-      <h1 className="mt-6 text-3xl font-semibold">Chats</h1><p className="mt-2 mb-6 text-stone-500">A simple space to keep the conversation going.</p>
-      <form className="mb-5 flex flex-wrap items-end gap-3" onSubmit={e => { e.preventDefault(); const d = new FormData(e.currentTarget); setPair({ studentId:Number(d.get("user")), vendorId:Number(d.get("other")), role:d.get("role") as "student" | "vendor" }); }}>
-        <label className="text-sm">Buyer student ID<input name="user" type="number" min="1" required defaultValue="1" className="mt-1 block w-36 rounded-lg border bg-white p-2" /></label>
-        <label className="text-sm">Vendor ID<input name="other" type="number" min="1" required defaultValue="2" className="mt-1 block w-36 rounded-lg border bg-white p-2" /></label>
-        <label className="text-sm">View as<select name="role" className="mt-1 block rounded-lg border bg-white p-2"><option value="student">Buyer</option><option value="vendor">Vendor</option></select></label>
-        <button className="rounded-lg bg-[#630031] px-4 py-2 text-white">Open chat</button>
-      </form>
-      <p className="mb-4 text-xs text-stone-500">Hackathon demo · Use the same student and vendor IDs in both tabs; choose a different view.</p>
-      {pair ? <ChatWindow key={pair.studentId+":"+pair.vendorId+":"+pair.role} {...pair} /> : <div className="rounded-3xl border bg-white p-16 text-center text-stone-500">Choose a student and vendor to open a conversation.</div>}
-    </div>
-  </main>;
+  const { status } = useSession();
+  const { account, inbox, api, error, retry } = useChat();
+  const [selected, setSelected] = useState<Contact | null>(null);
+  const [search, setSearch] = useState("");
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [searchError, setSearchError] = useState("");
+  useEffect(() => {
+    if (!account) return;
+    let active = true;
+    const timer = setTimeout(async () => {
+      try { const rows = await api<Contact[]>(`/chat/contacts?q=${encodeURIComponent(search)}`); if (active) { setContacts(rows); setSearchError(""); } }
+      catch (e) { if (active) setSearchError((e as Error).message); }
+    }, 250);
+    return () => { active = false; clearTimeout(timer); };
+  }, [account, api, search]);
+  return <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
+    <Navbar />
+    <div className="flex items-center justify-between border-b px-4 py-3"><h1 className="font-heading text-xl font-semibold">Messages</h1><Link href="/" className="text-sm text-brand-maroon">Back to marketplace</Link></div>
+    {status === "unauthenticated" ? <main className="m-auto space-y-4 p-6 text-center"><p>Sign in to message another Hokie.</p><button onClick={() => signIn("google", { redirectTo: "/chats" })} className="rounded-lg bg-brand-maroon px-4 py-2 text-white">Continue with Google</button></main> : <>
+      {error && <div role="alert" className="border-b p-3 text-sm text-destructive">{error} <button onClick={retry} className="underline">Retry</button></div>}
+      {!account ? <p role="status" className="m-auto p-6 text-muted-foreground">{error ? "Messaging is not available yet." : "Connecting your account…"}</p> : <main className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 md:border-x">
+        <aside aria-label="Conversations" className={`${selected ? "hidden md:flex" : "flex"} w-full flex-col border-r md:w-80 md:shrink-0`}>
+          <div className="p-4"><label htmlFor="chat-search" className="mb-2 block text-sm font-medium">Find a person</label><input id="chat-search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name" className="w-full rounded-lg border bg-background px-3 py-2 outline-none focus:ring-2 focus:ring-brand-orange" /></div>
+          <div className="flex-1 overflow-y-auto">
+            {!search && inbox.map(row => <button key={row.contact.studentId} onClick={() => setSelected(row.contact)} className={`flex w-full gap-3 border-b p-4 text-left hover:bg-muted ${selected?.studentId === row.contact.studentId ? "bg-muted" : ""}`}>
+              <div className="min-w-0 flex-1"><div className="truncate font-medium">{row.contact.name}</div><p className="truncate text-sm text-muted-foreground">{row.lastMessage.text}</p></div>
+              {row.unread > 0 && <span aria-label={`${row.unread} unread messages`} className="h-fit rounded-full bg-red-600 px-2 py-0.5 text-xs text-white">{row.unread}</span>}
+            </button>)}
+            <p className="px-4 pt-4 pb-2 text-xs font-medium text-muted-foreground">{search ? "Search results" : "Start a conversation"}</p>
+            {searchError && <p role="alert" className="px-4 text-sm text-destructive">{searchError}</p>}
+            {contacts.filter(c => search || !inbox.some(row => row.contact.studentId === c.studentId)).map(c => <button key={c.studentId} onClick={() => setSelected(c)} className="block w-full px-4 py-3 text-left hover:bg-muted"><span className="font-medium">{c.name}</span><span className="ml-2 text-xs text-muted-foreground">{c.vendorId ? "Seller" : "Student"}</span></button>)}
+            {!contacts.length && <p className="px-4 py-6 text-sm text-muted-foreground">{search ? "No matching users." : "Other users appear here after signing in with Google."}</p>}
+          </div>
+        </aside>
+        {selected ? <ChatWindow key={`${account.studentId}:${selected.studentId}`} contact={selected} onBack={() => setSelected(null)} /> : <div className="hidden flex-1 items-center justify-center p-8 text-muted-foreground md:flex">Choose a conversation or find someone to message.</div>}
+      </main>}
+    </>}
+  </div>;
 }

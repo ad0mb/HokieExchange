@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useMemo, useState } from "react";
+import { useChat } from "@/chat/chat-provider";
 import { CirclePlus, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +31,8 @@ export function CreateListingDialog({
   onCreate: (service: Service) => void;
 }) {
   const formId = useId();
+  const { ensureVendor, account } = useChat();
+  const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
 
   const [title, setTitle] = useState("");
@@ -65,8 +68,10 @@ export function CreateListingDialog({
     );
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (saving) return;
+    if (!account) { setError("Sign in and wait for your account to connect before selling."); return; }
 
     const priceValue = Number(price);
     if (!title.trim()) {
@@ -86,6 +91,9 @@ export function CreateListingDialog({
       return;
     }
 
+    setSaving(true);
+    try { await ensureVendor(); }
+    catch (e) { setError((e as Error).message); setSaving(false); return; }
     onCreate({
       id: crypto.randomUUID(),
       title: title.trim(),
@@ -103,6 +111,7 @@ export function CreateListingDialog({
     });
 
     resetForm();
+    setSaving(false);
     setOpen(false);
   }
 
@@ -283,8 +292,8 @@ export function CreateListingDialog({
         </form>
 
         <DialogFooter>
-          <Button type="submit" form={formId} className="bg-brand-maroon text-white hover:bg-brand-maroon-dark">
-            Create listing
+          <Button disabled={saving} type="submit" form={formId} className="bg-brand-maroon text-white hover:bg-brand-maroon-dark">
+            {saving ? "Creating…" : "Create listing"}
           </Button>
         </DialogFooter>
       </DialogContent>

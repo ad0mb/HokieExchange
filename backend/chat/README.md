@@ -1,47 +1,59 @@
-# Direct chat
+# Google accounts and messaging
 
-Run one backend worker for this MVP. MongoDB stores one document per message in
-chat_messages, indexed by conversation_key and _id. FastAPI owns pair sorting,
-validation, history (50 messages per page), persistence, and socket broadcasts.
-There is no separate conversation collection.
+Google OAuth is handled by the existing Auth.js Google provider in Next.js.
+On a verified Google sign-in, the frontend server signs a short-lived assertion
+for FastAPI. The backend maps the Google subject to a MySQL student record.
+The browser never chooses its sender ID. A vendor is created for that student
+when they submit a listing; `/auth/vendor` is idempotent. Session `studentId`
+and `vendorId` expose the linked IDs, and the chat provider refreshes them.
 
-Set MONGODB_URI to your connection string (including the database name).
-Set CHAT_DEMO_MODE=true explicitly for local testing.
-Run: uv run uvicorn main:app --reload
-Run the frontend with npm run dev and visit /chats.
-Use student_id=1 and vendor_id=2 in both tabs. Select Buyer in one tab and Vendor
-in the other. IDs are assumed valid; no database lookup is required.
+All users share one inbox keyed by student ID, including sellers. MongoDB stores
+messages in `chat_messages`. Only the sender and recipient receive broadcasts. Read state is persisted and
+updated only for messages up to the last loaded message in a focused chat.
+Unread counts appear in red on the navbar and conversation list. Reconnecting
+refreshes history and unread counts. Run **one backend worker** for this MVP.
 
-This demo accepts self-selected IDs. It is NOT authenticated private messaging.
-Replace the demo identity inputs in HTTP and Socket.IO with verified login
-identity before deployment. It is disabled unless CHAT_DEMO_MODE=true.
+## Setup
 
-Optional: CHAT_ORIGINS is a comma-separated list of frontend origins.
-Frontend NEXT_PUBLIC_CHAT_API_URL defaults to http://localhost:8000.
-Keep MONGODB_URI in the backend environment only.
+1. Copy `backend/.env.example` to `backend/.env`. Set `DATABASE_URL`,
+   `MONGODB_URI` (include the database name), `CHAT_AUTH_SECRET` and `CHAT_ORIGINS`.
+2. Copy `frontend/.env.example` to `frontend/.env.local`. Set the Google OAuth
+   client ID/secret, `AUTH_SECRET`, and the **same** `CHAT_AUTH_SECRET` as backend.
+   Generate separate random secrets, for example `openssl rand -hex 32`.
+   Never prefix either secret with `NEXT_PUBLIC_`.
+3. `BACKEND_URL` is reachable from the Next.js server. `NEXT_PUBLIC_CHAT_API_URL`
+   is reachable from the browser. Locally use the example values. On deployment,
+   use HTTPS for the public backend and list the frontend origin in `CHAT_ORIGINS`.
+4. In the existing Google OAuth client, allow the callback:
+   `http://localhost:3000/api/auth/callback/google` and your deployed equivalent.
+5. From `backend`, run `uv sync`, then `uv run python migrate_identity.py` once.
+   This adds `google_identities`, an `email` column to `students`, and makes
+   graduation year nullable. It preserves existing student/vendor records.
+6. Run `uv run uvicorn main:app --reload --env-file .env` in backend.
+7. Run `npm ci` then `npm run dev` in frontend. Restart both servers after env edits.
+8. Sign out of any old sessions, then sign in with Google in two separate browser
+   profiles. Open Messages, search for the other user's name, and send a message.
+   Keep the recipient on the marketplace to check the red unread badge; opening
+   and focusing the conversation clears it. Refresh to verify history persists.
 
-GET /chat/vendors/{vendor_id}/messages?student_id=1&before=<optional message ID>
-returns messages and next_before. Socket.IO authenticates a demo connection with
-{student_id, vendor_id, role: "student" | "vendor"}; send_message accepts {text} and acknowledges the saved
-message. message_received broadcasts only to the corresponding pair.
-On reconnect the UI reloads recent history and merges by message ID.
-Failed sends preserve the draft; retries are manual and should follow a history
-reload if the acknowledgement timed out.
+The `students` table now has a nullable, unique `email` column. On a verified
+Google sign-in, the backend links to an existing student whose email matches
+the verified Google email; otherwise it creates a new student. Seeded synthetic
+records have a null email, so they are left untouched. Google's subject remains
+the authoritative identity, and an email already linked to a different Google
+subject is rejected rather than reassigning an account.
 
-Keys are student:<student_id>:vendor:<vendor_id>; the namespaces prevent numeric
-ID collisions. The sender role comes from the socket session, not the message
-payload. ChatIdentity is the replacement point for verified OAuth identity.
-Earlier user-to-user demo messages remain stored under their original keys;
-they are not mixed into the new student/vendor conversations.
+The listing UI still uses its existing local/demo listing storage. This change
+links the seller account; it does not replace the listing persistence system.
+Use the inbox's real registered-user directory to start conversations; seeded
+marketplace sellers do not necessarily have an authenticated account.
 
-UI structure:
-- src/app/chats: independent route
-- src/chat/chatui: assembled chat screen
-- src/chat/chatsignal: API and socket client
-- src/components/chat: reusable MessageList and MessageComposer. These accept
-  presentation props/callbacks and have no dependency on MongoDB or Socket.IO.
+## Checks
 
-Run the integration test against a running backend:
-uv run python -m chat.test_live
-The test uses random demo IDs, creates two test messages, and removes only their
-exact message IDs in finally. It needs MONGODB_URI for verification and cleanup.
+- `uv run python -m unittest test_identity_chat -v`: isolated auth/ownership/chat tests.
+- `npm run lint` and `npm run build`: frontend checks.
+- `uv run python -m chat.test_live`: optional real backend/Mongo test. Set two
+  fresh `CHAT_TEST_TOKEN_A/B` values from `/api/chat/token` in two signed-in
+  browser sessions. It sends two messages and removes their exact IDs afterward.
+
+No attachments, group chats, typing indicators, or delivery receipts are included.

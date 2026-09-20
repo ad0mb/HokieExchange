@@ -1,13 +1,16 @@
-import { io } from "socket.io-client";
-export type Message = { id: string; sender_role: "student" | "vendor"; student_id: number; vendor_id: number; text: string; created_at: string };
+export type Contact = { studentId: number; vendorId: number | null; name: string };
+export type Message = { id: string; sender_id: number; recipient_id: number; text: string; created_at: string; read: boolean };
 export type History = { messages: Message[]; next_before: string | null };
-const base = process.env.NEXT_PUBLIC_CHAT_API_URL || "http://localhost:8000";
-export function connectChat(studentId: number, vendorId: number, role: "student" | "vendor") {
-  return io(base, { autoConnect: false, auth: { student_id: studentId, vendor_id: vendorId, role } });
-}
-export async function history(studentId: number, vendorId: number, before?: string): Promise<History> {
-  const query = new URLSearchParams({ student_id: String(studentId) }); if (before) query.set("before", before);
-  const response = await fetch(base + "/chat/vendors/" + vendorId + "/messages?" + query, { cache: "no-store" });
-  if (!response.ok) throw new Error("Could not load history. Check the backend connection and demo configuration.");
+export type Conversation = { contact: Contact; lastMessage: Message; unread: number };
+export const chatUrl = process.env.NEXT_PUBLIC_CHAT_API_URL || "http://localhost:8000";
+
+export async function request<T>(token: string, path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(chatUrl + path, { ...init, cache: "no-store",
+    headers: { "Content-Type": "application/json", ...init?.headers, Authorization: `Bearer ${token}` },
+    signal: AbortSignal.timeout(12000) });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(typeof body.detail === "string" ? body.detail : "Unable to load messaging. Please retry.");
+  }
   return response.json();
 }

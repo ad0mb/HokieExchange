@@ -4,6 +4,7 @@ import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useChat } from "@/chat/chat-provider";
 
 export function MessagesButton({
   label = "Messages",
@@ -14,6 +15,8 @@ export function MessagesButton({
   href?: string;
   className?: string;
 }) {
+  const { inbox } = useChat();
+  const unread = inbox.reduce((sum, row) => sum + row.unread, 0);
   return (
     <Button
       size="lg"
@@ -26,6 +29,7 @@ export function MessagesButton({
     >
       <MessageCircle className="h-4 w-4" />
       {label}
+      {unread > 0 && <span aria-label={`${unread} unread messages`} className="ml-1 rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">{unread > 99 ? "99+" : unread}</span>}
     </Button>
   );
 }

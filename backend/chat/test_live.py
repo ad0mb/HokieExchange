@@ -1,59 +1,60 @@
-"""Real HTTP + Socket.IO + MongoDB test. Removes only this test's messages."""
+"""Optional real backend/Mongo check using two freshly signed-in accounts.
+
+Set CHAT_TEST_TOKEN_A and CHAT_TEST_TOKEN_B from /api/chat/token in each
+account's browser session. Tokens last five minutes. Run python -m chat.test_live.
+Creates two messages and deletes only those exact IDs after the test.
+"""
 import asyncio
 import os
-import secrets
 import socketio
 import httpx
-from pymongo import AsyncMongoClient
 from bson import ObjectId
+from pymongo import AsyncMongoClient
+from dotenv import load_dotenv
 
 
 async def main():
+    load_dotenv()
     url = os.getenv("CHAT_TEST_URL", "http://127.0.0.1:8000")
-    a = secrets.randbelow(100000000) + 1000000000
-    b, c = a + 1, a + 2
-    clients = [socketio.AsyncClient() for _ in range(3)]
-    received = [[], [], []]
+    tokens = [os.environ["CHAT_TEST_TOKEN_A"], os.environ["CHAT_TEST_TOKEN_B"]]
+    clients = [socketio.AsyncClient(), socketio.AsyncClient()]
     mongo = AsyncMongoClient(os.environ["MONGODB_URI"])
     collection = mongo.get_default_database().chat_messages
     ids = []
+    events = [[], []]
     try:
-        for i, (user, other) in enumerate([(a,b), (a,b), (c,b)]):
-            async def on_message(data, index=i):
-                received[index].append(data)
-            clients[i].on("message_received", on_message)
-            await clients[i].connect(url, auth={"student_id":user, "vendor_id":other, "role":"vendor" if i == 1 else "student"}, transports=["websocket"])
-        async with httpx.AsyncClient() as http:
-            empty = await http.get(f"{url}/chat/vendors/{b}/messages", params={"student_id":a})
-            assert empty.status_code == 200 and empty.json()["messages"] == []
-            invalid = await clients[0].call("send_message", {"text":"   "})
-            assert not invalid["ok"]
-            for index in (0,1):
-                reply = await clients[index].call("send_message", {"text":f"Integration test {index}"})
-                assert reply["ok"]
+        async with httpx.AsyncClient(base_url=url) as http:
+            users = []
+            for i, value in enumerate(tokens):
+                response = await http.post("/auth/me", headers={"Authorization": f"Bearer {value}"})
+                response.raise_for_status()
+                users.append(response.json()["studentId"])
+                async def received(message, index=i):
+                    events[index].append(message)
+                clients[i].on("message_received", received)
+                await clients[i].connect(url, auth={"token": value}, transports=["websocket"])
+            assert users[0] != users[1], "Use two different Google accounts."
+            for index in (0, 1):
+                reply = await clients[index].call("send_message", {"recipient_id": users[1-index], "text": "Live integration test"})
+                assert reply["ok"], reply
                 ids.append(ObjectId(reply["message"]["id"]))
-            for _ in range(40):
-                if len(received[0]) == 2 and len(received[1]) == 2:
+            for _ in range(100):
+                if all(len(e) >= 2 for e in events):
                     break
                 await asyncio.sleep(.05)
-            assert len(received[0]) == len(received[1]) == 2
-            assert received[2] == [], "Unrelated conversation received messages"
-            await clients[1].disconnect()
-            history = (await http.get(f"{url}/chat/vendors/{b}/messages", params={"student_id":a})).json()
-            assert len(history["messages"]) == 2
-            assert await collection.count_documents({"_id":{"$in":ids}}) == 2
-            await clients[1].connect(url, auth={"student_id":a,"vendor_id":b,"role":"vendor"}, transports=["websocket"])
-            again = (await http.get(f"{url}/chat/vendors/{b}/messages", params={"student_id":a})).json()
-            assert history == again
-            bad = await http.get(f"{url}/chat/vendors/{b}/messages", params={"student_id":a,"before":"invalid"})
-            assert bad.status_code == 422
-        print("PASS: empty history, two-way sockets, validation, pair isolation, Mongo persistence and reconnect history")
+            assert all(len(e) >= 2 for e in events), "Live broadcast missing"
+            assert await collection.count_documents({"_id": {"$in": ids}}) == 2
+            response = await http.get(f"/chat/users/{users[1]}/messages", headers={"Authorization": f"Bearer {tokens[0]}"})
+            response.raise_for_status()
+            assert set(map(str, ids)).issubset({m["id"] for m in response.json()["messages"]})
+            assert (await http.get("/chat/inbox")).status_code in (401, 403)
+            print("PASS: authenticated two-way live delivery, persisted history, unauthenticated access rejected")
     finally:
         for client in clients:
             if client.connected:
                 await client.disconnect()
         if ids:
-            await collection.delete_many({"_id":{"$in":ids}})
+            await collection.delete_many({"_id": {"$in": ids}})
         await mongo.close()
 
 

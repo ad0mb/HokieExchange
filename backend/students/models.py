@@ -14,8 +14,9 @@ class Student(Base):
     student_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     first_name: Mapped[str] = mapped_column(String(25), nullable=False)
     last_name: Mapped[str] = mapped_column(String(25), nullable=False)
-    graduation_year: Mapped[int] = mapped_column(Integer, nullable=False)
+    graduation_year: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     sso_id: Mapped[Optional[int]] = mapped_column(Integer)
+    email: Mapped[Optional[str]] = mapped_column(String(320), unique=True, nullable=True)
     date_created: Mapped[Optional[datetime.datetime]] = mapped_column(
         TIMESTAMP, server_default=text("CURRENT_TIMESTAMP")
     )
