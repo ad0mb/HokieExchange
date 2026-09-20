@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { BookingDialog } from "@/components/marketplace/booking-dialog";
 import { categories } from "@/lib/categories";
 import type { Service } from "@/lib/services";
+import { cn } from "@/lib/utils";
 
 export function ServiceCard({ service }: { service: Service }) {
   const Icon = categories.find((c) => c.slug === service.categorySlug)!.icon;
@@ -31,24 +32,40 @@ export function ServiceCard({ service }: { service: Service }) {
 
         {images.length > 1 && (
           <>
-            <button
-              type="button"
-              aria-label="Previous photo"
-              onClick={() =>
-                setImageIndex((i) => (i - 1 + images.length) % images.length)
-              }
-              className="absolute left-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-foreground opacity-0 shadow transition-opacity group-hover:opacity-100"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              aria-label="Next photo"
-              onClick={() => setImageIndex((i) => (i + 1) % images.length)}
-              className="absolute right-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-foreground opacity-0 shadow transition-opacity group-hover:opacity-100"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
+            {imageIndex > 0 && (
+              <button
+                type="button"
+                aria-label="Previous photo"
+                onClick={() => setImageIndex((i) => Math.max(i - 1, 0))}
+                className="absolute left-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-foreground opacity-0 shadow transition-opacity group-hover:opacity-100"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+            )}
+            {imageIndex < images.length - 1 && (
+              <button
+                type="button"
+                aria-label="Next photo"
+                onClick={() =>
+                  setImageIndex((i) => Math.min(i + 1, images.length - 1))
+                }
+                className="absolute right-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-foreground opacity-0 shadow transition-opacity group-hover:opacity-100"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            )}
+
+            <div className="absolute bottom-1.5 left-1/2 flex -translate-x-1/2 gap-1">
+              {images.map((_, i) => (
+                <span
+                  key={i}
+                  className={cn(
+                    "h-1.5 w-1.5 rounded-full",
+                    i === imageIndex ? "bg-brand-orange" : "bg-white/70"
+                  )}
+                />
+              ))}
+            </div>
           </>
         )}
       </div>
