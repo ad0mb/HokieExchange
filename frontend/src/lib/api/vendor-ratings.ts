@@ -8,6 +8,7 @@ export type VendorRatingCreate = {
   vendor_id: number;
   rating: string;
   description?: string | null;
+  appointment_id?: number | null;
 };
 
 export type VendorRatingUpdate = {
@@ -19,15 +20,32 @@ export type VendorRating = {
   rating_id: number;
   student_id: number;
   vendor_id: number;
+  appointment_id: number | null;
   rating: string;
   description: string | null;
   date_created: string | null;
   date_updated: string | null;
 };
 
-export function getAllVendorRatings(vendorId?: number): Promise<VendorRating[]> {
-  const query = vendorId != null ? `?vendor_id=${vendorId}` : "";
-  return request<VendorRating[]>(`/vendor-ratings/${query}`);
+export type VendorRatingAverage = {
+  vendor_id: number;
+  average: string | null;
+  count: number;
+};
+
+export function getAllVendorRatings(params?: {
+  vendorId?: number;
+  studentId?: number;
+}): Promise<VendorRating[]> {
+  const q = new URLSearchParams();
+  if (params?.vendorId != null) q.set("vendor_id", String(params.vendorId));
+  if (params?.studentId != null) q.set("student_id", String(params.studentId));
+  const query = q.toString();
+  return request<VendorRating[]>(`/vendor-ratings/${query ? `?${query}` : ""}`);
+}
+
+export function getVendorRatingAverage(vendorId: number): Promise<VendorRatingAverage> {
+  return request<VendorRatingAverage>(`/vendor-ratings/average?vendor_id=${vendorId}`);
 }
 
 export function getVendorRating(ratingId: number): Promise<VendorRating> {

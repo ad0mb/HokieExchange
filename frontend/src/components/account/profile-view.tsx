@@ -18,14 +18,17 @@ export function ProfileView({
   listings = [],
   showMessageButton = false,
   messageHref = "/chats",
+  isVendor = true,
 }: {
   profile?: AccountProfile;
   listings?: Service[];
   showMessageButton?: boolean;
   messageHref?: string;
+  isVendor?: boolean;
 }) {
   const [view, setView] = useState<View>("vendor");
-  const roleProfile = profile[view];
+  const activeView: View = isVendor ? view : "buyer";
+  const roleProfile = profile[activeView];
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-8">
@@ -62,58 +65,64 @@ export function ProfileView({
           <MessagesButton label="Message" href={messageHref} />
         )}
 
-        <div className="flex flex-col items-end gap-2">
-          <div className="relative inline-flex rounded-full border border-brand-maroon p-1.5">
-            <div
-              className={cn(
-                "absolute inset-y-1.5 left-1.5 w-24 rounded-full bg-brand-orange transition-transform duration-300 ease-in-out",
-                view === "buyer" && "translate-x-24"
-              )}
-            />
-            <button
-              type="button"
-              onClick={() => setView("vendor")}
-              className={cn(
-                "relative z-10 w-24 rounded-full py-2 text-base font-semibold transition-colors duration-300",
-                view === "vendor" ? "text-white" : "text-brand-maroon"
-              )}
-            >
-              Vendor
-            </button>
-            <button
-              type="button"
-              onClick={() => setView("buyer")}
-              className={cn(
-                "relative z-10 w-24 rounded-full py-2 text-base font-semibold transition-colors duration-300",
-                view === "buyer" ? "text-white" : "text-brand-maroon"
-              )}
-            >
-              Buyer
-            </button>
+        {isVendor && (
+          <div className="flex flex-col items-end gap-2">
+            <div className="relative inline-flex rounded-full border border-brand-maroon p-1.5">
+              <div
+                className={cn(
+                  "absolute inset-y-1.5 left-1.5 w-24 rounded-full bg-brand-orange transition-transform duration-300 ease-in-out",
+                  view === "buyer" && "translate-x-24"
+                )}
+              />
+              <button
+                type="button"
+                onClick={() => setView("vendor")}
+                className={cn(
+                  "relative z-10 w-24 rounded-full py-2 text-base font-semibold transition-colors duration-300",
+                  view === "vendor" ? "text-white" : "text-brand-maroon"
+                )}
+              >
+                Vendor
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("buyer")}
+                className={cn(
+                  "relative z-10 w-24 rounded-full py-2 text-base font-semibold transition-colors duration-300",
+                  view === "buyer" ? "text-white" : "text-brand-maroon"
+                )}
+              >
+                Buyer
+              </button>
+            </div>
+            <p className="max-w-[14rem] text-right text-sm text-muted-foreground">
+              Switches between {showMessageButton ? "their" : "your"} vendor and
+              buyer info
+            </p>
           </div>
-          <p className="max-w-[14rem] text-right text-sm text-muted-foreground">
-            Switches between {showMessageButton ? "their" : "your"} vendor and
-            buyer info
-          </p>
-        </div>
+        )}
       </div>
 
       <div className="mt-8 grid gap-8 sm:grid-cols-[1fr_auto]">
-        <div>
-          <h2 className="mb-3 font-heading text-lg font-bold text-brand-orange">
-            About
-          </h2>
-          <div className="min-h-48 rounded-lg border bg-background p-4 text-base text-muted-foreground">
-            {profile.bio}
+        {profile.bio ? (
+          <div>
+            <h2 className="mb-3 font-heading text-lg font-bold text-brand-orange">
+              About
+            </h2>
+            <div className="min-h-48 rounded-lg border bg-background p-4 text-base text-muted-foreground">
+              {profile.bio}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div />
+        )}
 
         <div className="text-center sm:text-right">
           <h2 className="font-heading text-lg font-bold text-brand-orange">
-            {view === "vendor" ? "Total Sold Items" : "Total Bought Items"}
+            {activeView === "vendor" ? "Total Sold Items" : "Total Bought Items"}
           </h2>
           <p className="text-5xl font-bold">
-            {view === "vendor"
+            {activeView === "vendor"
               ? profile.vendor.itemsSold
               : profile.buyer.itemsBought}
           </p>
@@ -142,7 +151,7 @@ export function ProfileView({
         </div>
       </div>
 
-      {view === "vendor" && (
+      {activeView === "vendor" && (
         <div className="mt-10">
           <h2 className="mb-4 font-heading text-2xl font-bold text-brand-orange">
             Current Listings

@@ -4,8 +4,34 @@ from typing import Optional
 
 from sqlalchemy import DECIMAL, DateTime, ForeignKeyConstraint, Index, Integer, String, TIMESTAMP, Time, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.types import TypeDecorator
 
 from database import Base
+
+
+class TimeValue(TypeDecorator):
+    """TIME column whose driver (MySQL/DataBricks) may return a string."""
+
+    impl = Time
+    cache_ok = True
+
+    def result_processor(self, dialect, coltype):
+        def process(value):
+            if value is None or isinstance(value, datetime.time):
+                return value
+            if isinstance(value, str):
+                return datetime.time.fromisoformat(value)
+            if isinstance(value, datetime.timedelta):
+                seconds = value.seconds
+                return datetime.time(
+                    seconds // 3600,
+                    (seconds % 3600) // 60,
+                    seconds % 60,
+                    microsecond=value.microseconds,
+                )
+            return value
+
+        return process
 
 
 class Service(Base):
@@ -28,7 +54,7 @@ class Service(Base):
     location: Mapped[Optional[str]] = mapped_column(String(255))
     category: Mapped[str] = mapped_column(String(50), nullable=False)
     price: Mapped[decimal.Decimal] = mapped_column(DECIMAL(10, 2), nullable=False)
-    duration: Mapped[datetime.time] = mapped_column(Time, nullable=False)
+    duration: Mapped[datetime.time] = mapped_column(TimeValue, nullable=False)
     date_created: Mapped[Optional[datetime.datetime]] = mapped_column(
         TIMESTAMP, server_default=text("CURRENT_TIMESTAMP")
     )
@@ -40,6 +66,10 @@ class Service(Base):
     time_blocks: Mapped[list["TimeBlock"]] = relationship(
         "TimeBlock", back_populates="service", passive_deletes=True
     )
+
+    @property
+    def seller_name(self) -> str:
+        return f"{self.vendor.student.first_name} {self.vendor.student.last_name}".strip()
 
 
 class TimeBlock(Base):
@@ -60,7 +90,7 @@ class TimeBlock(Base):
     )
     service_id: Mapped[int] = mapped_column(Integer, nullable=False)
     day_of_week: Mapped[int] = mapped_column(Integer, nullable=False, comment="0=Monday ... 6=Sunday")
-    start_time: Mapped[datetime.time] = mapped_column(Time, nullable=False)
+    start_time: Mapped[datetime.time] = mapped_column(TimeValue, nullable=False)
     status: Mapped[str] = mapped_column(
         String(11),
         nullable=False,

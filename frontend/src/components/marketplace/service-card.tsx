@@ -3,35 +3,22 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Pencil, Star } from "lucide-react";
+import { Pencil, Sparkles, Star } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { BookingDialog } from "@/components/marketplace/booking-dialog";
-import type { BookingSelection } from "@/components/marketplace/availability-picker";
 import { ImageCarousel } from "@/components/marketplace/image-carousel";
 import { ListingDialog } from "@/components/marketplace/listing-dialog";
 import { categories } from "@/lib/categories";
 import { sellerHref } from "@/lib/sellers";
-import { bookSlot } from "@/lib/services-store";
-import { useCurrentViewer } from "@/lib/use-current-viewer";
+import { useCurrentAccount } from "@/lib/use-current-account";
 import type { Service } from "@/lib/services";
 
 export function ServiceCard({ service }: { service: Service }) {
-  const Icon = categories.find((c) => c.slug === service.categorySlug)!.icon;
+  const Icon = categories.find((c) => c.slug === service.categorySlug)?.icon ?? Sparkles;
   const [detailOpen, setDetailOpen] = useState(false);
   const router = useRouter();
-  const viewer = useCurrentViewer();
-  const isOwnListing = service.sellerName === "You";
-
-  function handleBook(selection: BookingSelection) {
-    bookSlot(service.id, selection.slot, {
-      id: crypto.randomUUID(),
-      dateLabel: selection.dateLabel,
-      timeLabel: selection.label,
-      bookerName: viewer.name,
-      bookerInitials: viewer.initials,
-      bookerImage: viewer.image,
-    });
-  }
+  const { vendorId } = useCurrentAccount();
+  const isOwnListing = vendorId != null && service.vendorId === vendorId;
 
   function openCard() {
     if (isOwnListing) {
@@ -68,7 +55,7 @@ export function ServiceCard({ service }: { service: Service }) {
           <p className="font-bold text-brand-orange">
             ${service.price}
             <span className="ml-1 text-xs font-normal text-muted-foreground">
-              {service.priceUnit}
+              {service.durationLabel}
             </span>
           </p>
           <h3 className="line-clamp-1 text-sm font-semibold">{service.title}</h3>
@@ -76,12 +63,12 @@ export function ServiceCard({ service }: { service: Service }) {
             <div className="flex items-center gap-1 text-xs">
               <Star className="h-3.5 w-3.5 fill-foreground text-foreground" />
               <span className="font-semibold">{service.rating.toFixed(1)}</span>
-              <span className="text-muted-foreground">
-                ({service.ratingCount})
-              </span>
+              <span className="text-muted-foreground">({service.ratingCount})</span>
             </div>
           )}
-          <p className="text-[11px] text-muted-foreground">{service.location}</p>
+          {service.location && (
+            <p className="text-[11px] text-muted-foreground">{service.location}</p>
+          )}
           <p className="line-clamp-1 text-xs text-muted-foreground">
             {service.description}
           </p>
@@ -97,7 +84,7 @@ export function ServiceCard({ service }: { service: Service }) {
                 </AvatarFallback>
               </Avatar>
               <Link
-                href={sellerHref(service)}
+                href={sellerHref(service, vendorId)}
                 className="text-xs text-muted-foreground hover:text-brand-maroon hover:underline"
               >
                 {service.sellerName}
@@ -112,23 +99,14 @@ export function ServiceCard({ service }: { service: Service }) {
                 Manage
               </Link>
             ) : (
-              <BookingDialog
-                serviceTitle={service.title}
-                bookingTimes={service.bookingTimes}
-                onBook={handleBook}
-              />
+              <BookingDialog serviceId={Number(service.id)} serviceTitle={service.title} />
             )}
           </div>
         </div>
       </div>
 
       {!isOwnListing && (
-        <ListingDialog
-          service={service}
-          open={detailOpen}
-          onOpenChange={setDetailOpen}
-          onBook={handleBook}
-        />
+        <ListingDialog service={service} open={detailOpen} onOpenChange={setDetailOpen} />
       )}
     </>
   );

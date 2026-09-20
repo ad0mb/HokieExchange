@@ -11,6 +11,7 @@ export type AccountProfile = {
   email: string;
   avatarInitials: string;
   image?: string;
+  graduationYear?: number | null;
   bio: string;
   buyer: {
     rating: number;

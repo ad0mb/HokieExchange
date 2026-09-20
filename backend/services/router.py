@@ -65,6 +65,7 @@ def list_services(
             category=service.category,
             price=service.price,
             duration=service.duration,
+            seller_name=service.seller_name,
             rating=avg_rating,
             rating_count=rating_count,
             date_created=service.date_created,

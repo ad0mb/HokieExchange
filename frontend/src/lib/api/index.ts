@@ -11,5 +11,7 @@ export { request } from "@/lib/api/client";
 export * from "@/lib/api/students";
 export * from "@/lib/api/vendors";
 export * from "@/lib/api/items";
+export * from "@/lib/api/services";
+export * from "@/lib/api/appointments";
 export * from "@/lib/api/consumer-ratings";
 export * from "@/lib/api/vendor-ratings";

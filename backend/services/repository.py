@@ -1,11 +1,12 @@
 import decimal
 
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from services.models import Service, TimeBlock
 from services.schemas import ServiceCreate, ServiceUpdate, TimeBlockCreate, TimeBlockUpdate
 from vendor_ratings.models import VendorRating
+from vendors.models import Vendor
 
 
 class ServiceRepository:
@@ -20,7 +21,11 @@ class ServiceRepository:
         return service
 
     def get_by_id(self, service_id: int) -> Service | None:
-        return self.db.get(Service, service_id)
+        return self.db.get(
+            Service,
+            service_id,
+            options=[joinedload(Service.vendor).joinedload(Vendor.student)],
+        )
 
     def get_all(self) -> list[Service]:
         return list(self.db.scalars(select(Service)).all())
@@ -49,6 +54,7 @@ class ServiceRepository:
                 func.coalesce(rating_subq.c.rating_count, 0),
             )
             .outerjoin(rating_subq, Service.vendor_id == rating_subq.c.vendor_id)
+            .options(joinedload(Service.vendor).joinedload(Vendor.student))
         )
         if vendor_id is not None:
             statement = statement.where(Service.vendor_id == vendor_id)

@@ -33,6 +33,7 @@ class ServiceRead(BaseModel):
     category: str
     price: decimal.Decimal
     duration: datetime.time
+    seller_name: str
     date_created: Optional[datetime.datetime]
     date_updated: Optional[datetime.datetime]
 
@@ -48,6 +49,7 @@ class ServiceWithRating(BaseModel):
     category: str
     price: decimal.Decimal
     duration: datetime.time
+    seller_name: str
     rating: Optional[decimal.Decimal]
     rating_count: int
     date_created: Optional[datetime.datetime]

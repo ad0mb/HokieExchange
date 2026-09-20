@@ -11,7 +11,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { categories } from "@/lib/categories";
-import { addService, useServices } from "@/lib/services-store";
+import { useListings } from "@/lib/listing-data";
 
 export function MarketplaceView({
   mobileMenuOpen,
@@ -20,17 +20,24 @@ export function MarketplaceView({
   mobileMenuOpen: boolean;
   onMobileMenuOpenChange: (open: boolean) => void;
 }) {
-  const services = useServices();
+  const { services, loading, refresh } = useListings();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
   const heading =
     categories.find((c) => c.slug === selectedCategory)?.label ?? "Recommended";
+
+  const locations = [...new Set(services.map((s) => s.location).filter((l): l is string => !!l))];
+
+  const query = search.trim().toLowerCase();
   const visibleServices = services.filter(
     (s) =>
-      s.sellerName !== "You" &&
+      (!query ||
+        s.title.toLowerCase().includes(query) ||
+        s.description.toLowerCase().includes(query)) &&
       (!selectedCategory || s.categorySlug === selectedCategory) &&
-      (!selectedLocation || s.location === selectedLocation)
+      (!selectedLocation || s.location === selectedLocation),
   );
 
   const sidebar = (
@@ -39,7 +46,10 @@ export function MarketplaceView({
       onSelectCategory={setSelectedCategory}
       selectedLocation={selectedLocation}
       onSelectLocation={setSelectedLocation}
-      onCreateListing={addService}
+      locations={locations}
+      search={search}
+      onSearchChange={setSearch}
+      onCreated={refresh}
     />
   );
 
@@ -66,11 +76,15 @@ export function MarketplaceView({
           <LocationBadge />
         </div>
 
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
-          {visibleServices.map((service) => (
-            <ServiceCard key={service.id} service={service} />
-          ))}
-        </div>
+        {loading ? (
+          <p className="text-muted-foreground">Loading listings…</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
+            {visibleServices.map((service) => (
+              <ServiceCard key={service.id} service={service} />
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );

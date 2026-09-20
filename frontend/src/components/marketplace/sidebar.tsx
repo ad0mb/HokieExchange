@@ -8,7 +8,6 @@ import { CreateListingDialog } from "@/components/marketplace/create-listing-dia
 import { VTIcon } from "@/components/VTIcon";
 import { cn } from "@/lib/utils";
 import { categories } from "@/lib/categories";
-import { locations, type Service } from "@/lib/services";
 
 function SidebarLink({
   icon: Icon,
@@ -30,7 +29,7 @@ function SidebarLink({
   const className = cn(
     "flex items-center gap-3 rounded-md px-2 hover:bg-accent",
     bubble ? "py-2 text-base font-medium" : "py-2 text-sm font-medium",
-    active && "bg-accent"
+    active && "bg-accent",
   );
 
   const iconEl = bubble ? (
@@ -63,13 +62,19 @@ export function Sidebar({
   onSelectCategory,
   selectedLocation,
   onSelectLocation,
-  onCreateListing,
+  locations,
+  search,
+  onSearchChange,
+  onCreated,
 }: {
   selectedCategory: string | null;
   onSelectCategory: (slug: string | null) => void;
   selectedLocation: string | null;
   onSelectLocation: (location: string | null) => void;
-  onCreateListing: (service: Service) => void;
+  locations: string[];
+  search: string;
+  onSearchChange: (value: string) => void;
+  onCreated?: () => void;
 }) {
   return (
     <div className="flex h-full flex-col gap-4">
@@ -80,6 +85,8 @@ export function Sidebar({
         />
         <Input
           placeholder="Search Exchange"
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
           className="pl-9 placeholder:text-brand-orange"
         />
       </div>
@@ -98,35 +105,37 @@ export function Sidebar({
         <SidebarLink href="/account" icon={UserRound} label="VT account" iconClassName="text-brand-maroon" />
       </nav>
 
-      <CreateListingDialog onCreate={onCreateListing} />
+      <CreateListingDialog onCreated={onCreated} />
 
       <Separator />
 
-      <div className="flex flex-col">
-        <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground">
-          Locations
-        </h3>
-        <div className="flex flex-wrap gap-2 px-2">
-          {locations.map((location) => {
-            const active = selectedLocation === location;
-            return (
-              <button
-                key={location}
-                type="button"
-                onClick={() => onSelectLocation(active ? null : location)}
-                className={cn(
-                  "rounded-full border px-3 py-1 text-xs font-medium",
-                  active
-                    ? "border-brand-orange bg-brand-orange text-white"
-                    : "border-brand-maroon text-brand-maroon"
-                )}
-              >
-                {location}, VA
-              </button>
-            );
-          })}
+      {locations.length > 0 && (
+        <div className="flex flex-col">
+          <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground">
+            Locations
+          </h3>
+          <div className="flex flex-wrap gap-2 px-2">
+            {locations.map((location) => {
+              const active = selectedLocation === location;
+              return (
+                <button
+                  key={location}
+                  type="button"
+                  onClick={() => onSelectLocation(active ? null : location)}
+                  className={cn(
+                    "rounded-full border px-3 py-1 text-xs font-medium",
+                    active
+                      ? "border-brand-orange bg-brand-orange text-white"
+                      : "border-brand-maroon text-brand-maroon",
+                  )}
+                >
+                  {location}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       <Separator />
 

@@ -1,8 +1,7 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
-import { useChat } from "@/chat/chat-provider";
-import { CirclePlus, ImagePlus } from "lucide-react";
+import { useId, useState } from "react";
+import { CirclePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,44 +17,36 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { categories } from "@/lib/categories";
-import { locations, type Service } from "@/lib/services";
 import { DEFAULT_SLOT_TIMES, formatSlotStart, type SlotStart } from "@/lib/availability";
+import { createListing } from "@/lib/listing-data";
+import { useCurrentAccount } from "@/lib/use-current-account";
 
 function slotKey([hour, minute]: SlotStart) {
   return `${hour}:${minute}`;
 }
 
-export function CreateListingDialog({
-  onCreate,
-}: {
-  onCreate: (service: Service) => void;
-}) {
+export function CreateListingDialog({ onCreated }: { onCreated?: () => void }) {
   const formId = useId();
-  const { ensureVendor, account } = useChat();
-  const [saving, setSaving] = useState(false);
+  const { vendorId } = useCurrentAccount();
   const [open, setOpen] = useState(false);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [duration, setDuration] = useState("30");
   const [categorySlug, setCategorySlug] = useState(categories[0].slug);
-  const [location, setLocation] = useState(locations[0]);
-  const [images, setImages] = useState<File[]>([]);
+  const [location, setLocation] = useState("");
   const [selectedSlots, setSelectedSlots] = useState<SlotStart[]>([]);
   const [error, setError] = useState<string | null>(null);
-
-  const imagePreviews = useMemo(
-    () => images.map((file) => URL.createObjectURL(file)),
-    [images]
-  );
+  const [submitting, setSubmitting] = useState(false);
 
   function resetForm() {
     setTitle("");
     setDescription("");
     setPrice("");
+    setDuration("30");
     setCategorySlug(categories[0].slug);
-    setLocation(locations[0]);
-    setImages([]);
+    setLocation("");
     setSelectedSlots([]);
     setError(null);
   }
@@ -64,16 +55,15 @@ export function CreateListingDialog({
     setSelectedSlots((prev) =>
       prev.some((s) => slotKey(s) === slotKey(slot))
         ? prev.filter((s) => slotKey(s) !== slotKey(slot))
-        : [...prev, slot]
+        : [...prev, slot],
     );
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (saving) return;
-    if (!account) { setError("Sign in and wait for your account to connect before selling."); return; }
 
     const priceValue = Number(price);
+    const durationValue = Number(duration);
     if (!title.trim()) {
       setError("Give your listing a title.");
       return;
@@ -86,33 +76,35 @@ export function CreateListingDialog({
       setError("Enter a price greater than $0.");
       return;
     }
-    if (images.length === 0) {
-      setError("Add at least one image.");
+    if (Number.isNaN(durationValue) || durationValue <= 0) {
+      setError("Enter a duration in minutes.");
+      return;
+    }
+    if (vendorId == null) {
+      setError("Create a seller profile before listing services.");
       return;
     }
 
-    setSaving(true);
-    try { await ensureVendor(); }
-    catch (e) { setError((e as Error).message); setSaving(false); return; }
-    onCreate({
-      id: crypto.randomUUID(),
-      title: title.trim(),
-      description: description.trim(),
-      price: priceValue,
-      priceUnit: "per order",
-      categorySlug,
-      location,
-      sellerName: "You",
-      sellerInitials: "Y",
-      rating: 0,
-      ratingCount: 0,
-      imageUrls: imagePreviews.length > 0 ? imagePreviews : undefined,
-      bookingTimes: selectedSlots.length > 0 ? selectedSlots : undefined,
-    });
-
-    resetForm();
-    setSaving(false);
-    setOpen(false);
+    setSubmitting(true);
+    setError(null);
+    try {
+      await createListing(vendorId, {
+        serviceName: title.trim(),
+        description: description.trim(),
+        location: location.trim() || null,
+        category: categorySlug,
+        price: priceValue,
+        durationMinutes: durationValue,
+        slots: selectedSlots,
+      });
+      resetForm();
+      setOpen(false);
+      onCreated?.();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not create the listing.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -174,37 +166,46 @@ export function CreateListingDialog({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor={`${formId}-location`}>
-                Location <span className="text-destructive">*</span>
-              </Label>
-              <select
+              <Label htmlFor={`${formId}-location`}>Location</Label>
+              <Input
                 id={`${formId}-location`}
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-              >
-                {locations.map((loc) => (
-                  <option key={loc} value={loc}>
-                    {loc}, VA
-                  </option>
-                ))}
-              </select>
+                placeholder="e.g. Blacksburg"
+              />
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor={`${formId}-price`}>
-              Price ($) <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id={`${formId}-price`}
-              type="number"
-              min="0"
-              step="0.01"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="25"
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor={`${formId}-price`}>
+                Price ($) <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id={`${formId}-price`}
+                type="number"
+                min="0"
+                step="0.01"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="25"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor={`${formId}-duration`}>
+                Duration (min) <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id={`${formId}-duration`}
+                type="number"
+                min="1"
+                step="1"
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                placeholder="30"
+              />
+            </div>
           </div>
 
           <div className="space-y-1.5">
@@ -220,54 +221,15 @@ export function CreateListingDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor={`${formId}-images`}>
-              Relevant images <span className="text-destructive">*</span>
-            </Label>
-            <label
-              htmlFor={`${formId}-images`}
-              className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed px-2.5 py-2 text-sm text-muted-foreground hover:border-brand-maroon hover:text-brand-maroon"
-            >
-              <ImagePlus className="h-4 w-4" />
-              {images.length > 0
-                ? `${images.length} image${images.length > 1 ? "s" : ""} selected`
-                : "Upload photos of your service"}
-            </label>
-            <input
-              id={`${formId}-images`}
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-              onChange={(e) => {
-                imagePreviews.forEach((url) => URL.revokeObjectURL(url));
-                setImages(Array.from(e.target.files ?? []));
-              }}
-            />
-            {imagePreviews.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-1">
-                {imagePreviews.map((src, i) => (
-                  // eslint-disable-next-line @next/next/no-img-element -- client-only object URL preview
-                  <img
-                    key={src}
-                    src={src}
-                    alt={`Upload ${i + 1}`}
-                    className="h-14 w-14 rounded-md border object-cover"
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-1.5">
             <Label>Booking times</Label>
             <p className="text-xs text-muted-foreground">
-              Pick the times you&apos;re usually available. Leave blank to use the
-              default schedule.
+              Pick the times you&apos;re usually available (repeats weekly). Leave blank
+              for a 10:00 AM default.
             </p>
             <div className="flex flex-wrap gap-1.5">
               {DEFAULT_SLOT_TIMES.map((slot) => {
                 const active = selectedSlots.some(
-                  (s) => slotKey(s) === slotKey(slot)
+                  (s) => slotKey(s) === slotKey(slot),
                 );
                 return (
                   <button
@@ -278,7 +240,7 @@ export function CreateListingDialog({
                       "rounded-full border px-2.5 py-1 text-xs font-medium",
                       active
                         ? "border-brand-orange bg-brand-orange text-white"
-                        : "border-brand-maroon text-brand-maroon"
+                        : "border-brand-maroon text-brand-maroon",
                     )}
                   >
                     {formatSlotStart(slot)}
@@ -292,8 +254,13 @@ export function CreateListingDialog({
         </form>
 
         <DialogFooter>
-          <Button disabled={saving} type="submit" form={formId} className="bg-brand-maroon text-white hover:bg-brand-maroon-dark">
-            {saving ? "Creating…" : "Create listing"}
+          <Button
+            type="submit"
+            form={formId}
+            disabled={submitting}
+            className="bg-brand-maroon text-white hover:bg-brand-maroon-dark"
+          >
+            {submitting ? "Creating…" : "Create listing"}
           </Button>
         </DialogFooter>
       </DialogContent>

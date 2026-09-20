@@ -6,14 +6,14 @@ import { request } from "@/lib/api/client";
 export type StudentCreate = {
   first_name: string;
   last_name: string;
-  graduation_year: number;
+  graduation_year?: number | null;
   sso_id?: number | null;
 };
 
 export type StudentUpdate = {
   first_name?: string;
   last_name?: string;
-  graduation_year?: number;
+  graduation_year?: number | null;
   sso_id?: number | null;
 };
 
@@ -21,8 +21,9 @@ export type Student = {
   student_id: number;
   first_name: string;
   last_name: string;
-  graduation_year: number;
+  graduation_year: number | null;
   sso_id: number | null;
+  email: string | null;
   date_created: string | null;
   date_updated: string | null;
 };

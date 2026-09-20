@@ -15,27 +15,41 @@ import {
   type BookingSelection,
 } from "@/components/marketplace/availability-picker";
 import { BookingConfirmedDialog } from "@/components/marketplace/booking-confirmed-dialog";
-import type { SlotStart } from "@/lib/availability";
+import { bookAppointment, useAvailability } from "@/lib/listing-data";
+import { useCurrentAccount } from "@/lib/use-current-account";
 
 export function BookingDialog({
+  serviceId,
   serviceTitle,
-  bookingTimes,
-  onBook,
 }: {
+  serviceId: number;
   serviceTitle: string;
-  bookingTimes?: SlotStart[];
-  onBook?: (selection: BookingSelection) => void;
 }) {
+  const { studentId } = useCurrentAccount();
   const [open, setOpen] = useState(false);
   const [selection, setSelection] = useState<BookingSelection | null>(null);
   const [confirmed, setConfirmed] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { slots, loading } = useAvailability(serviceId, open);
 
-  function handleBook() {
+  async function handleBook() {
     if (!selection) return;
-    onBook?.(selection);
-    setSelection(null);
-    setOpen(false);
-    setConfirmed(true);
+    if (studentId == null) {
+      setError("Sign in to book a slot.");
+      return;
+    }
+    try {
+      await bookAppointment({
+        timeBlockId: selection.timeBlockId,
+        bookedAt: selection.datetime,
+        studentId,
+      });
+      setSelection(null);
+      setOpen(false);
+      setConfirmed(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not book this slot.");
+    }
   }
 
   return (
@@ -49,20 +63,26 @@ export function BookingDialog({
           <DialogHeader>
             <DialogTitle>{serviceTitle}</DialogTitle>
             <DialogDescription>
-              Pick an available time slot over the next 7 days.
+              Pick an available time over the next 14 days.
             </DialogDescription>
           </DialogHeader>
 
-          <AvailabilityPicker
-            bookingTimes={bookingTimes}
-            selected={selection?.key ?? null}
-            onSelect={setSelection}
-            className="max-h-80 overflow-y-auto pr-1"
-          />
+          {loading ? (
+            <p className="py-4 text-sm text-muted-foreground">Loading availability…</p>
+          ) : (
+            <AvailabilityPicker
+              slots={slots}
+              selected={selection?.key ?? null}
+              onSelect={setSelection}
+              className="max-h-80 overflow-y-auto pr-1"
+            />
+          )}
+
+          {error && <p className="text-xs text-destructive">{error}</p>}
 
           <Button
             type="button"
-            disabled={!selection}
+            disabled={!selection || loading}
             onClick={handleBook}
             className="bg-brand-maroon text-white hover:bg-brand-maroon-dark"
           >
