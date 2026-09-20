@@ -7,7 +7,8 @@ from dotenv import load_dotenv
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-# Single canonical env file at the repo root, shared with the frontend.
+# Deployment environment wins, then backend/.env, then the legacy root .env.
+load_dotenv(Path(__file__).resolve().parent / ".env")
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 

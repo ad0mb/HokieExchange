@@ -2,7 +2,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { io, type Socket } from "socket.io-client";
-import { chatUrl, request, type Contact, type Conversation } from "./chatsignal/client";
+import { chatPath, request, type Contact, type Conversation } from "./chatsignal/client";
 
 type ChatContextValue = {
   account: Contact | null; inbox: Conversation[]; socket: Socket | null; connected: boolean; error: string;
@@ -55,7 +55,9 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         const value = await api<Contact>("/auth/me", { method: "POST" });
         if (!active) return;
         setAccount(value);
-        client = io(chatUrl, { autoConnect: false, auth: { token: data.token } });
+        // Poll through the same-origin HTTP proxy; do not connect to the VM directly.
+        client = io({ path: chatPath, transports: ["polling"], upgrade: false,
+          autoConnect: false, auth: { token: data.token } });
         setSocket(client);
         client.on("connect", () => { if (active) { setConnected(true); setError(""); void refreshInbox().catch(e => setError(e.message)); } });
         client.on("disconnect", () => { if (active) setConnected(false); });

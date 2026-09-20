@@ -5,9 +5,8 @@ export type History = { messages: Message[]; next_before: string | null };
 export type Conversation = { contact: Contact; lastMessage: Message; unread: number };
 export const BOT_ID = 0;
 export const BOT: Contact = { studentId: BOT_ID, vendorId: null, name: "Hokie Assistant" };
-// socket.io connects to this directly (WebSockets can't go through the Vercel
-// serverless proxy — the backend must be reachable over wss:// in production).
-export const chatUrl = process.env.NEXT_PUBLIC_CHAT_API_URL || "http://localhost:8000";
+// Use the website's existing rewrite to reach Socket.IO on the HTTP backend.
+export const chatPath = "/api/backend/socket.io";
 
 // Chat REST is proxied through the Next.js server like the rest of the API.
 const REST_BASE = "/api/backend";
