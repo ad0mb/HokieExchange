@@ -1,31 +1,51 @@
-from enum import StrEnum
-
-from repository import VendorRepository
-from repository import get_vendor_repo
-
-from fastapi import APIRouter, Query, Depends
 from typing import Annotated
 
-router = APIRouter(
-    prefix="/vendors",
-    tags=["Vendors"]
-)
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
-Repo = Annotated[VendorRepository, Depends(get_vendor_repo)]
+from database import get_db
+from vendors.repository import VendorRepository
+from vendors.schemas import VendorCreate, VendorRead, VendorUpdate
 
-# for now, just a list of the vendors in alphabetical order
-# ideally it will get top/popular/recommended vendors
-# paginated
-@router.get("/")
-async def recommended_vendors(
-    repo: Repo,
-    page_length: Annotated[int, Query(min_length=1),] = 10,
-    page_number: Annotated[int, Query(min_length=1),] = 1,
-):
-    return repo.get_all()
+router = APIRouter(prefix="/vendors", tags=["Vendors"])
 
 
-# returns the profile of a specific vendor, not the listings
-@router.get("/{vendor_id}")
-async def get_vendor(repo: Repo, vendor_id: int):
-    return repo.get_by_id(vendor_id)
+def get_vendor_repository(db: Session = Depends(get_db)) -> VendorRepository:
+    return VendorRepository(db)
+
+
+Repo = Annotated[VendorRepository, Depends(get_vendor_repository)]
+
+
+@router.get("/", response_model=list[VendorRead])
+def list_vendors(repo: Repo) -> list[VendorRead]:
+    return [VendorRead.model_validate(vendor) for vendor in repo.get_all()]
+
+
+@router.get("/{vendor_id}", response_model=VendorRead)
+def get_vendor(vendor_id: int, repo: Repo) -> VendorRead:
+    vendor = repo.get_by_id(vendor_id)
+    if vendor is None:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    return VendorRead.model_validate(vendor)
+
+
+@router.post("/", response_model=VendorRead, status_code=201)
+def create_vendor(data: VendorCreate, repo: Repo) -> VendorRead:
+    return VendorRead.model_validate(repo.create(data))
+
+
+@router.patch("/{vendor_id}", response_model=VendorRead)
+def update_vendor(vendor_id: int, data: VendorUpdate, repo: Repo) -> VendorRead:
+    vendor = repo.get_by_id(vendor_id)
+    if vendor is None:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    return VendorRead.model_validate(repo.update(vendor, data))
+
+
+@router.delete("/{vendor_id}", status_code=204)
+def delete_vendor(vendor_id: int, repo: Repo) -> None:
+    vendor = repo.get_by_id(vendor_id)
+    if vendor is None:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+    repo.delete(vendor)
