@@ -22,6 +22,8 @@ export type Appointment = {
   booked_at: string;
   student_id: number;
   status: string;
+  service_name: string;
+  vendor_id: number;
   price_at_booking: string;
   cancel_reason: string | null;
   cancelled_at: string | null;

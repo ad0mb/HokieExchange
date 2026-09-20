@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from appointments.models import Appointment
 from appointments.schemas import AppointmentCreate, AppointmentUpdate
@@ -34,13 +34,24 @@ class AppointmentRepository:
         return appointment
 
     def get_by_id(self, appointment_id: int) -> Appointment | None:
-        return self.db.get(Appointment, appointment_id)
+        return self.db.get(
+            Appointment,
+            appointment_id,
+            options=[joinedload(Appointment.time_block).joinedload(TimeBlock.service)],
+        )
 
     def get_all(self) -> list[Appointment]:
-        return list(self.db.scalars(select(Appointment)).all())
+        statement = select(Appointment).options(
+            joinedload(Appointment.time_block).joinedload(TimeBlock.service)
+        )
+        return list(self.db.scalars(statement).all())
 
     def get_for_student(self, student_id: int) -> list[Appointment]:
-        statement = select(Appointment).where(Appointment.student_id == student_id)
+        statement = (
+            select(Appointment)
+            .where(Appointment.student_id == student_id)
+            .options(joinedload(Appointment.time_block).joinedload(TimeBlock.service))
+        )
         return list(self.db.scalars(statement).all())
 
     def get_for_time_block(self, time_block_id: int) -> list[Appointment]:
@@ -61,6 +72,7 @@ class AppointmentRepository:
             .join(TimeBlock, Appointment.time_block_id == TimeBlock.time_block_id)
             .join(Service, TimeBlock.service_id == Service.service_id)
             .where(Service.vendor_id == vendor_id)
+            .options(joinedload(Appointment.time_block).joinedload(TimeBlock.service))
         )
         return list(self.db.scalars(statement).all())
 

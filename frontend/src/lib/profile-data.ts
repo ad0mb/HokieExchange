@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import {
+  createConsumerRating,
   createVendorRating,
   getAllConsumerRatings,
   getAllStudents,
@@ -13,8 +14,10 @@ import {
   getVendorRatingAverage,
   listAppointments,
   listServices,
+  updateAppointment,
   updateStudent,
   updateVendor,
+  type Appointment,
   type Student,
   type Vendor,
 } from "@/lib/api";
@@ -162,17 +165,40 @@ export async function updateProfile(
   }
 }
 
-export async function rateVendor(
-  studentId: number,
-  vendorId: number,
-  rating: number,
-  description: string,
-): Promise<void> {
+export async function rateVendor(input: {
+  studentId: number;
+  vendorId: number;
+  rating: number;
+  description: string;
+  appointmentId: number;
+}): Promise<void> {
   await createVendorRating({
-    student_id: studentId,
-    vendor_id: vendorId,
-    rating: String(rating),
-    description,
+    student_id: input.studentId,
+    vendor_id: input.vendorId,
+    rating: String(input.rating),
+    description: input.description,
+    appointment_id: input.appointmentId,
+  });
+}
+
+export async function rateBuyer(input: {
+  studentId: number;
+  vendorId: number;
+  rating: number;
+  appointmentId: number;
+}): Promise<void> {
+  await createConsumerRating({
+    student_id: input.studentId,
+    vendor_id: input.vendorId,
+    rating: String(input.rating),
+    appointment_id: input.appointmentId,
+  });
+}
+
+export async function markCompleted(appointmentId: number): Promise<void> {
+  await updateAppointment(appointmentId, {
+    status: "complete",
+    completed_at: new Date().toISOString(),
   });
 }
 
@@ -262,4 +288,72 @@ export function useSellerProfile(slug: string) {
   }, [slug]);
 
   return { profile, listings, vendorId, loading };
+}
+
+async function fetchBookings(
+  studentId: number | undefined,
+  vendorId: number | null,
+): Promise<{
+  purchases: Appointment[];
+  sales: Appointment[];
+  ratedPurchaseIds: Set<number>;
+  ratedSaleIds: Set<number>;
+}> {
+  const [p, s, vendorRatings, consumerRatings] = await Promise.all([
+    studentId != null ? listAppointments({ studentId }) : Promise.resolve([]),
+    vendorId != null ? listAppointments({ vendorId }) : Promise.resolve([]),
+    studentId != null ? getAllVendorRatings({ studentId }) : Promise.resolve([]),
+    vendorId != null ? getAllConsumerRatings({ vendorId }) : Promise.resolve([]),
+  ]);
+  return {
+    purchases: p,
+    sales: s,
+    ratedPurchaseIds: new Set(
+      vendorRatings.map((r) => r.appointment_id).filter((x): x is number => x != null),
+    ),
+    ratedSaleIds: new Set(
+      consumerRatings.map((r) => r.appointment_id).filter((x): x is number => x != null),
+    ),
+  };
+}
+
+export function useBookings() {
+  const { studentId, vendorId } = useCurrentAccount();
+  const [purchases, setPurchases] = useState<Appointment[]>([]);
+  const [sales, setSales] = useState<Appointment[]>([]);
+  const [ratedPurchaseIds, setRatedPurchaseIds] = useState<Set<number>>(new Set());
+  const [ratedSaleIds, setRatedSaleIds] = useState<Set<number>>(new Set());
+  const [loading, setLoading] = useState(true);
+
+  const refresh = useCallback(async () => {
+    const result = await fetchBookings(studentId, vendorId);
+    setPurchases(result.purchases);
+    setSales(result.sales);
+    setRatedPurchaseIds(result.ratedPurchaseIds);
+    setRatedSaleIds(result.ratedSaleIds);
+  }, [studentId, vendorId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const result = await fetchBookings(studentId, vendorId);
+        if (!cancelled) {
+          setPurchases(result.purchases);
+          setSales(result.sales);
+          setRatedPurchaseIds(result.ratedPurchaseIds);
+          setRatedSaleIds(result.ratedSaleIds);
+        }
+      } catch {
+        // ignore
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [studentId, vendorId]);
+
+  return { purchases, sales, ratedPurchaseIds, ratedSaleIds, loading, refresh };
 }

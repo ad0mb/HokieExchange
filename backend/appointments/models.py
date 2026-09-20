@@ -58,3 +58,11 @@ class Appointment(Base):
     consumer_ratings: Mapped[list["ConsumerRating"]] = relationship(
         "ConsumerRating", back_populates="appointment", passive_deletes=True
     )
+
+    @property
+    def service_name(self) -> str:
+        return self.time_block.service.service_name
+
+    @property
+    def vendor_id(self) -> int:
+        return self.time_block.service.vendor_id

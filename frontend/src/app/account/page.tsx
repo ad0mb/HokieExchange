@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Navbar } from "@/components/marketplace/navbar";
 import { ProfileView } from "@/components/account/profile-view";
+import { BookingsSection } from "@/components/account/bookings-section";
 import { EditProfileDialog } from "@/components/account/edit-profile-dialog";
 import { Button } from "@/components/ui/button";
 import { useListings } from "@/lib/listing-data";
@@ -51,6 +52,7 @@ export default function AccountPage() {
         </Button>
       </div>
       <ProfileView profile={profile} listings={myListings} isVendor={isVendor} />
+      <BookingsSection />
       <EditProfileDialog
         open={editOpen}
         onOpenChange={setEditOpen}

@@ -11,40 +11,64 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { rateVendor } from "@/lib/profile-data";
+import { rateBuyer, rateVendor } from "@/lib/profile-data";
 import { useCurrentAccount } from "@/lib/use-current-account";
 import { cn } from "@/lib/utils";
 
 export function RateDialog({
   open,
   onOpenChange,
-  vendorId,
+  direction,
+  targetId,
+  appointmentId,
   onRated,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  vendorId: number;
+  direction: "vendor" | "buyer";
+  targetId: number;
+  appointmentId: number;
   onRated?: () => void;
 }) {
-  const { studentId } = useCurrentAccount();
+  const { studentId, vendorId } = useCurrentAccount();
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isVendor = direction === "vendor";
 
   async function handleSubmit() {
-    if (studentId == null) {
+    if (rating < 1) {
+      setError("Select a star rating.");
+      return;
+    }
+    if (isVendor && studentId == null) {
       setError("Sign in to leave a rating.");
       return;
     }
-    if (rating < 1) {
-      setError("Select a star rating.");
+    if (!isVendor && vendorId == null) {
+      setError("You need a seller profile to rate buyers.");
       return;
     }
     setBusy(true);
     setError(null);
     try {
-      await rateVendor(studentId, vendorId, rating, comment.trim());
+      if (isVendor) {
+        await rateVendor({
+          studentId: studentId!,
+          vendorId: targetId,
+          rating,
+          description: comment.trim(),
+          appointmentId,
+        });
+      } else {
+        await rateBuyer({
+          studentId: targetId,
+          vendorId: vendorId!,
+          rating,
+          appointmentId,
+        });
+      }
       setRating(0);
       setComment("");
       onOpenChange(false);
@@ -60,7 +84,7 @@ export function RateDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Rate this seller</DialogTitle>
+          <DialogTitle>{isVendor ? "Rate this seller" : "Rate this buyer"}</DialogTitle>
           <DialogDescription>Share your experience.</DialogDescription>
         </DialogHeader>
 
@@ -84,11 +108,13 @@ export function RateDialog({
           ))}
         </div>
 
-        <Textarea
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="Write a review…"
-        />
+        {isVendor && (
+          <Textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Write a review…"
+          />
+        )}
 
         {error && <p className="text-xs text-destructive">{error}</p>}
 

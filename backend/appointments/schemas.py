@@ -28,6 +28,8 @@ class AppointmentRead(BaseModel):
     booked_at: datetime.datetime
     student_id: int
     status: str
+    service_name: str
+    vendor_id: int
     price_at_booking: decimal.Decimal
     cancel_reason: Optional[str]
     cancelled_at: Optional[datetime.datetime]
