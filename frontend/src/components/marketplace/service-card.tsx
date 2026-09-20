@@ -27,7 +27,7 @@ export function ServiceCard({ service }: { service: Service }) {
                 key={i}
                 src={src}
                 alt={`${service.title} photo ${i + 1}`}
-                className="h-full w-full shrink-0 object-cover transition-transform group-hover:scale-110"
+                className="h-full w-full shrink-0 object-cover"
               />
             ))}
           </div>
