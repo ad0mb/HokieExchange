@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { CirclePlus, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,12 +45,6 @@ export function CreateListingDialog({
     () => images.map((file) => URL.createObjectURL(file)),
     [images]
   );
-
-  useEffect(() => {
-    return () => {
-      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [imagePreviews]);
 
   function resetForm() {
     setTitle("");
@@ -104,7 +98,7 @@ export function CreateListingDialog({
       sellerInitials: "Y",
       rating: 0,
       ratingCount: 0,
-      imageUrl: imagePreviews[0],
+      imageUrls: imagePreviews.length > 0 ? imagePreviews : undefined,
       bookingTimes: selectedSlots.length > 0 ? selectedSlots : undefined,
     });
 
@@ -235,7 +229,10 @@ export function CreateListingDialog({
               accept="image/*"
               multiple
               className="hidden"
-              onChange={(e) => setImages(Array.from(e.target.files ?? []))}
+              onChange={(e) => {
+                imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+                setImages(Array.from(e.target.files ?? []));
+              }}
             />
             {imagePreviews.length > 0 && (
               <div className="flex flex-wrap gap-2 pt-1">

@@ -12,7 +12,7 @@ export type Service = {
   location: string;
   rating: number;
   ratingCount: number;
-  imageUrl?: string;
+  imageUrls?: string[];
   bookingTimes?: SlotStart[];
 };
 
