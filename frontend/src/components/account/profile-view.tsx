@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, MessageCircle, Star } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft, Star } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ServiceCard } from "@/components/marketplace/service-card";
+import { MessagesButton } from "@/components/marketplace/messages-button";
 import { ReviewCard } from "@/components/account/review-card";
 import { cn } from "@/lib/utils";
 import { currentUser, type AccountProfile } from "@/lib/account";
@@ -41,6 +41,12 @@ export function ProfileView({
       <div className="flex flex-wrap items-center justify-between gap-8">
         <div className="flex flex-wrap items-center gap-5">
           <Avatar className="h-28 w-28">
+            {profile.image && (
+              <AvatarImage
+                src={profile.image}
+                alt={`${profile.firstName} ${profile.lastName}`}
+              />
+            )}
             <AvatarFallback className="bg-brand-maroon text-3xl text-white">
               {profile.avatarInitials}
             </AvatarFallback>
@@ -54,15 +60,7 @@ export function ProfileView({
         </div>
 
         {showMessageButton && (
-          <Button
-            size="lg"
-            nativeButton={false}
-            render={<Link href={messageHref} />}
-            className="font-heading gap-1.5 bg-brand-maroon px-4 text-sm text-white hover:bg-brand-maroon-dark sm:px-6 sm:text-base"
-          >
-            <MessageCircle className="h-4 w-4" />
-            Message
-          </Button>
+          <MessagesButton label="Message" href={messageHref} />
         )}
 
         <div className="flex flex-col items-end gap-2">

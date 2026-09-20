@@ -1,5 +1,6 @@
 "use client";
 
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -55,7 +56,11 @@ export function LoginDialog() {
           </DialogDescription>
         </DialogHeader>
 
-        <Button variant="outline" className="w-full gap-2">
+        <Button
+          variant="outline"
+          className="w-full gap-2"
+          onClick={() => signIn("google")}
+        >
           <GoogleIcon />
           Continue with Google
         </Button>

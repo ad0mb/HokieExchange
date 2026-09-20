@@ -10,6 +10,7 @@ export type AccountProfile = {
   lastName: string;
   email: string;
   avatarInitials: string;
+  image?: string;
   bio: string;
   buyer: {
     rating: number;
