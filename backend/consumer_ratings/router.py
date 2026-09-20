@@ -17,7 +17,7 @@ def get_consumer_rating_repository(db: Session = Depends(get_db)) -> ConsumerRat
 Repo = Annotated[ConsumerRatingRepository, Depends(get_consumer_rating_repository)]
 
 
-@router.get("/", response_model=list[ConsumerRatingRead])
+@router.get("", response_model=list[ConsumerRatingRead])
 def list_consumer_ratings(repo: Repo, vendor_id: int | None = None) -> list[ConsumerRatingRead]:
     ratings = repo.get_for_vendor(vendor_id) if vendor_id is not None else repo.get_all()
     return [ConsumerRatingRead.model_validate(rating) for rating in ratings]
@@ -31,7 +31,7 @@ def get_consumer_rating(rating_id: int, repo: Repo) -> ConsumerRatingRead:
     return ConsumerRatingRead.model_validate(rating)
 
 
-@router.post("/", response_model=ConsumerRatingRead, status_code=201)
+@router.post("", response_model=ConsumerRatingRead, status_code=201)
 def create_consumer_rating(data: ConsumerRatingCreate, repo: Repo) -> ConsumerRatingRead:
     return ConsumerRatingRead.model_validate(repo.create(data))
 

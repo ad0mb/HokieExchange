@@ -17,7 +17,7 @@ def get_student_repository(db: Session = Depends(get_db)) -> StudentRepository:
 Repo = Annotated[StudentRepository, Depends(get_student_repository)]
 
 
-@router.get("/", response_model=list[StudentRead])
+@router.get("", response_model=list[StudentRead])
 def list_students(repo: Repo) -> list[StudentRead]:
     return [StudentRead.model_validate(student) for student in repo.get_all()]
 
@@ -30,7 +30,7 @@ def get_student(student_id: int, repo: Repo) -> StudentRead:
     return StudentRead.model_validate(student)
 
 
-@router.post("/", response_model=StudentRead, status_code=201)
+@router.post("", response_model=StudentRead, status_code=201)
 def create_student(data: StudentCreate, repo: Repo) -> StudentRead:
     return StudentRead.model_validate(repo.create(data))
 

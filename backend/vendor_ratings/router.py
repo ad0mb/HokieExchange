@@ -17,7 +17,7 @@ def get_vendor_rating_repository(db: Session = Depends(get_db)) -> VendorRatingR
 Repo = Annotated[VendorRatingRepository, Depends(get_vendor_rating_repository)]
 
 
-@router.get("/", response_model=list[VendorRatingRead])
+@router.get("", response_model=list[VendorRatingRead])
 def list_vendor_ratings(repo: Repo, vendor_id: int | None = None) -> list[VendorRatingRead]:
     ratings = repo.get_for_vendor(vendor_id) if vendor_id is not None else repo.get_all()
     return [VendorRatingRead.model_validate(rating) for rating in ratings]
@@ -31,7 +31,7 @@ def get_vendor_rating(rating_id: int, repo: Repo) -> VendorRatingRead:
     return VendorRatingRead.model_validate(rating)
 
 
-@router.post("/", response_model=VendorRatingRead, status_code=201)
+@router.post("", response_model=VendorRatingRead, status_code=201)
 def create_vendor_rating(data: VendorRatingCreate, repo: Repo) -> VendorRatingRead:
     return VendorRatingRead.model_validate(repo.create(data))
 
