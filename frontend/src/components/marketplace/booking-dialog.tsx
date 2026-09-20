@@ -24,7 +24,7 @@ export function BookingDialog({
 }: {
   serviceTitle: string;
   bookingTimes?: SlotStart[];
-  onBook?: (slot: SlotStart) => void;
+  onBook?: (selection: BookingSelection) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [selection, setSelection] = useState<BookingSelection | null>(null);
@@ -32,7 +32,7 @@ export function BookingDialog({
 
   function handleBook() {
     if (!selection) return;
-    onBook?.(selection.slot);
+    onBook?.(selection);
     setSelection(null);
     setOpen(false);
     setConfirmed(true);

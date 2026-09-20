@@ -14,7 +14,6 @@ import { BookingConfirmedDialog } from "@/components/marketplace/booking-confirm
 import { ImageCarousel } from "@/components/marketplace/image-carousel";
 import { categories } from "@/lib/categories";
 import { sellerHref } from "@/lib/sellers";
-import type { SlotStart } from "@/lib/availability";
 import type { Service } from "@/lib/services";
 
 export function ListingDialog({
@@ -26,7 +25,7 @@ export function ListingDialog({
   service: Service;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onBook?: (slot: SlotStart) => void;
+  onBook?: (selection: BookingSelection) => void;
 }) {
   const [selection, setSelection] = useState<BookingSelection | null>(null);
   const [confirmed, setConfirmed] = useState(false);
@@ -34,7 +33,7 @@ export function ListingDialog({
 
   function handleBook() {
     if (!selection) return;
-    onBook?.(selection.slot);
+    onBook?.(selection);
     setSelection(null);
     onOpenChange(false);
     setConfirmed(true);

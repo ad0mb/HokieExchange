@@ -11,7 +11,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { categories } from "@/lib/categories";
-import { services as initialServices, type Service } from "@/lib/services";
+import { addService, useServices } from "@/lib/services-store";
 
 export function MarketplaceView({
   mobileMenuOpen,
@@ -20,7 +20,7 @@ export function MarketplaceView({
   mobileMenuOpen: boolean;
   onMobileMenuOpenChange: (open: boolean) => void;
 }) {
-  const [services, setServices] = useState<Service[]>(initialServices);
+  const services = useServices();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
 
@@ -28,6 +28,7 @@ export function MarketplaceView({
     categories.find((c) => c.slug === selectedCategory)?.label ?? "Recommended";
   const visibleServices = services.filter(
     (s) =>
+      s.sellerName !== "You" &&
       (!selectedCategory || s.categorySlug === selectedCategory) &&
       (!selectedLocation || s.location === selectedLocation)
   );
@@ -38,7 +39,7 @@ export function MarketplaceView({
       onSelectCategory={setSelectedCategory}
       selectedLocation={selectedLocation}
       onSelectLocation={setSelectedLocation}
-      onCreateListing={(service) => setServices((prev) => [service, ...prev])}
+      onCreateListing={addService}
     />
   );
 
