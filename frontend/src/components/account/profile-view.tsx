@@ -5,7 +5,6 @@ import Link from "next/link";
 import { ArrowLeft, MessageCircle, Star } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ServiceCard } from "@/components/marketplace/service-card";
 import { ReviewCard } from "@/components/account/review-card";
 import { cn } from "@/lib/utils";
@@ -46,19 +45,10 @@ export function ProfileView({
               {profile.avatarInitials}
             </AvatarFallback>
           </Avatar>
-          <div className="flex flex-col gap-3">
-            <div className="flex gap-3">
-              <Input
-                value={profile.firstName}
-                readOnly
-                className="h-12 w-32 text-base sm:w-40"
-              />
-              <Input
-                value={profile.lastName}
-                readOnly
-                className="h-12 w-32 text-base sm:w-40"
-              />
-            </div>
+          <div className="flex flex-col gap-1.5">
+            <h1 className="font-heading text-2xl font-bold">
+              {profile.firstName} {profile.lastName}
+            </h1>
             <p className="text-sm text-muted-foreground">{profile.email}</p>
           </div>
         </div>
@@ -66,6 +56,7 @@ export function ProfileView({
         {showMessageButton && (
           <Button
             size="lg"
+            nativeButton={false}
             render={<Link href={messageHref} />}
             className="font-heading gap-1.5 bg-brand-maroon px-4 text-sm text-white hover:bg-brand-maroon-dark sm:px-6 sm:text-base"
           >
