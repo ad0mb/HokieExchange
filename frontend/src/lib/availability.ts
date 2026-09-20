@@ -1,9 +1,14 @@
-export type DayAvailability = {
-  dateLabel: string;
-  times: string[];
+export type SlotStart = [hour: number, minute: number];
+
+export type TimeSlot = {
+  slot: SlotStart;
+  label: string;
 };
 
-export type SlotStart = [hour: number, minute: number];
+export type DayAvailability = {
+  dateLabel: string;
+  times: TimeSlot[];
+};
 
 export const DEFAULT_SLOT_TIMES: SlotStart[] = [
   [10, 0],
@@ -52,11 +57,12 @@ export function getUpcomingAvailability(
     const day = new Date(today);
     day.setDate(today.getDate() + dayOffset);
 
-    const times = slotTimes.map(([hour, minute]) => {
+    const times = slotTimes.map((slot) => {
+      const [hour, minute] = slot;
       const start = new Date(day);
       start.setHours(hour, minute, 0, 0);
       const end = new Date(start.getTime() + 30 * 60 * 1000);
-      return `${formatTime(start)} - ${formatTime(end)}`;
+      return { slot, label: `${formatTime(start)} - ${formatTime(end)}` };
     });
 
     return { dateLabel: formatDateLabel(day), times };
