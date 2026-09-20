@@ -1,13 +1,12 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Star } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { AvailabilityPicker } from "@/components/marketplace/availability-picker";
 import { ImageCarousel } from "@/components/marketplace/image-carousel";
 import { categories } from "@/lib/categories";
 import { sellerHref } from "@/lib/sellers";
@@ -22,15 +21,8 @@ export function ListingDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const formId = useId();
-  const router = useRouter();
-  const [message, setMessage] = useState("");
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const Icon = categories.find((c) => c.slug === service.categorySlug)!.icon;
-
-  function handleSend(e: FormEvent) {
-    e.preventDefault();
-    router.push("/chats");
-  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -104,27 +96,22 @@ export function ListingDialog({
             </div>
           </div>
 
-          <form
-            onSubmit={handleSend}
-            className="mt-auto flex flex-col gap-2 border-t pt-4"
-          >
-            <label htmlFor={`${formId}-message`} className="text-sm font-semibold">
-              Send seller a message
-            </label>
-            <Textarea
-              id={`${formId}-message`}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder={`Hi, is ${service.title} available?`}
-              className="min-h-16"
+          <div className="mt-auto flex flex-col gap-2 border-t pt-4">
+            <h3 className="text-sm font-semibold">Available bookings</h3>
+            <AvailabilityPicker
+              bookingTimes={service.bookingTimes}
+              selected={selectedSlot}
+              onSelect={setSelectedSlot}
+              className="max-h-48 overflow-y-auto pr-1"
             />
             <Button
-              type="submit"
+              type="button"
+              disabled={!selectedSlot}
               className="bg-brand-maroon text-white hover:bg-brand-maroon-dark"
             >
-              Send
+              Book
             </Button>
-          </form>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

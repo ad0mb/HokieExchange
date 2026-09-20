@@ -8,7 +8,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { getUpcomingAvailability, type SlotStart } from "@/lib/availability";
+import { AvailabilityPicker } from "@/components/marketplace/availability-picker";
+import type { SlotStart } from "@/lib/availability";
 
 export function BookingDialog({
   serviceTitle,
@@ -17,8 +18,6 @@ export function BookingDialog({
   serviceTitle: string;
   bookingTimes?: SlotStart[];
 }) {
-  const availability = getUpcomingAvailability(7, bookingTimes);
-
   return (
     <Dialog>
       <DialogTrigger className="text-xs font-semibold text-brand-maroon hover:underline">
@@ -33,24 +32,10 @@ export function BookingDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="max-h-80 space-y-4 overflow-y-auto pr-1">
-          {availability.map((day) => (
-            <div key={day.dateLabel}>
-              <h3 className="mb-1.5 text-sm font-semibold">{day.dateLabel}</h3>
-              <div className="flex flex-wrap gap-1.5">
-                {day.times.map((time) => (
-                  <button
-                    key={time}
-                    type="button"
-                    className="rounded-full border px-2.5 py-1 text-xs hover:border-brand-maroon hover:text-brand-maroon"
-                  >
-                    {time}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+        <AvailabilityPicker
+          bookingTimes={bookingTimes}
+          className="max-h-80 overflow-y-auto pr-1"
+        />
       </DialogContent>
     </Dialog>
   );
