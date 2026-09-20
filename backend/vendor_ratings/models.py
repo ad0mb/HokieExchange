@@ -20,7 +20,7 @@ class VendorRating(Base):
     rating_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     student_id: Mapped[int] = mapped_column(Integer, nullable=False)
     vendor_id: Mapped[int] = mapped_column(Integer, nullable=False)
-    rating: Mapped[decimal.Decimal] = mapped_column(DECIMAL(10, 0), nullable=False)
+    rating: Mapped[decimal.Decimal] = mapped_column(DECIMAL(5, 1), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String(1000))
     date_created: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
     date_updated: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"))

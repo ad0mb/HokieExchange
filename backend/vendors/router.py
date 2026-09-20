@@ -17,7 +17,7 @@ def get_vendor_repository(db: Session = Depends(get_db)) -> VendorRepository:
 Repo = Annotated[VendorRepository, Depends(get_vendor_repository)]
 
 
-@router.get("/", response_model=list[VendorRead])
+@router.get("", response_model=list[VendorRead])
 def list_vendors(repo: Repo) -> list[VendorRead]:
     return [VendorRead.model_validate(vendor) for vendor in repo.get_all()]
 
@@ -30,7 +30,7 @@ def get_vendor(vendor_id: int, repo: Repo) -> VendorRead:
     return VendorRead.model_validate(vendor)
 
 
-@router.post("/", response_model=VendorRead, status_code=201)
+@router.post("", response_model=VendorRead, status_code=201)
 def create_vendor(data: VendorCreate, repo: Repo) -> VendorRead:
     return VendorRead.model_validate(repo.create(data))
 

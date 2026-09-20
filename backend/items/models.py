@@ -25,7 +25,7 @@ class Item(Base):
     vendor_id: Mapped[int] = mapped_column(Integer, nullable=False)
     item_name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String(1000))
-    price: Mapped[decimal.Decimal] = mapped_column(DECIMAL(10, 0), nullable=False)
+    price: Mapped[decimal.Decimal] = mapped_column(DECIMAL(10, 2), nullable=False)
     stock: Mapped[int] = mapped_column(Integer, nullable=False)
     date_created: Mapped[Optional[datetime.datetime]] = mapped_column(
         DateTime, server_default=text("CURRENT_TIMESTAMP")
