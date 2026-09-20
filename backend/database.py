@@ -2,8 +2,11 @@ import os
 from collections.abc import Generator
 from functools import lru_cache
 
+from dotenv import load_dotenv
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+
+load_dotenv()
 
 
 class Base(DeclarativeBase):
@@ -19,8 +22,12 @@ def get_engine() -> Engine:
     return create_engine(database_url, pool_pre_ping=True)
 
 
+@lru_cache
+def get_session_factory() -> sessionmaker[Session]:
+    return sessionmaker(bind=get_engine())
+
+
 def get_db() -> Generator[Session, None, None]:
     """Provide one SQLAlchemy session to a FastAPI request."""
-    session_factory = sessionmaker(bind=get_engine())
-    with session_factory() as db:
+    with get_session_factory()() as db:
         yield db

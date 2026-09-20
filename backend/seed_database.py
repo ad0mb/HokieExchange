@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session, configure_mappers
 
 import model_registry  # noqa: F401
 from consumer_ratings.models import ConsumerRating
+from items.models import Item
 from services.models import Service, TimeBlock, TimeBlockConfig
 from students.models import Student
 from vendor_ratings.models import VendorRating
@@ -22,9 +23,9 @@ def seed_database(db: Session) -> dict[str, int]:
     run_label = f"[HOKIE_EXCHANGE_SEED_{sso_start}]"
 
     students = [
-        Student(first_name=101, last_name=201, graduation_year=2027, sso_id=sso_start),
-        Student(first_name=102, last_name=202, graduation_year=2028, sso_id=sso_start + 1),
-        Student(first_name=103, last_name=203, graduation_year=2029, sso_id=sso_start + 2),
+        Student(first_name="Alice", last_name="Hokie", graduation_year=2027, sso_id=sso_start),
+        Student(first_name="Bob", last_name="Hokie", graduation_year=2028, sso_id=sso_start + 1),
+        Student(first_name="Carol", last_name="Hokie", graduation_year=2029, sso_id=sso_start + 2),
     ]
     db.add_all(students)
     db.flush()
@@ -40,6 +41,12 @@ def seed_database(db: Session) -> dict[str, int]:
         Service(vendor_id=vendors[1].vendor_id, service_name="Synthetic Food Pickup", description=f"{run_label} Dining-hall pickup", location="Drillfield", schedule_type="per-block"),
     ]
     db.add_all(services)
+    db.flush()
+    items = [
+        Item(vendor_id=vendors[0].vendor_id, item_name="Synthetic Textbook", description=f"{run_label} Used calculus textbook", price=40, stock=2),
+        Item(vendor_id=vendors[1].vendor_id, item_name="Synthetic Mini Fridge", description=f"{run_label} Dorm mini fridge", price=85, stock=1),
+    ]
+    db.add_all(items)
     db.flush()
     time_block_configs = [
         TimeBlockConfig(service_id=services[0].service_id, duration=datetime.time(0, 30), price=20),
@@ -64,6 +71,7 @@ def seed_database(db: Session) -> dict[str, int]:
     db.commit()
     return {
         "students": len(students), "vendors": len(vendors), "services": len(services),
+        "items": len(items),
         "time_block_configs": len(time_block_configs), "time_blocks": len(time_blocks),
         "consumer_ratings": len(consumer_ratings), "vendor_ratings": len(vendor_ratings),
     }
