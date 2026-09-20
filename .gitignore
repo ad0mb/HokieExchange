@@ -3,3 +3,8 @@
 
 # Google OAuth credentials
 *client_secret*.json
+
+# Environment variables (single canonical file — never commit secrets)
+.env
+.env.*
+!.env.example

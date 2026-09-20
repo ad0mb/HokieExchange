@@ -1,12 +1,14 @@
 import os
 from collections.abc import Generator
 from functools import lru_cache
+from pathlib import Path
 
 from dotenv import load_dotenv
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-load_dotenv()
+# Single canonical env file at the repo root, shared with the frontend.
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 
 class Base(DeclarativeBase):
